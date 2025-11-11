@@ -106,8 +106,45 @@
                     </svg>
                     <p class="upload-text">Arrastra tu video aquí o haz clic para seleccionar</p>
                     <p class="upload-hint">Formatos soportados: MP4, AVI, MOV, MKV</p>
-                    <input type="file" id="videoFileInput" class="file-input-hidden" accept="video/*" onchange="handleVideoUpload(event)">
+                    <input type="file" id="videoFileInput" class="file-input-hidden" accept="video/*" onchange="handleVideoSelection(event)">
                 </div>
+
+                <!-- Video Preview Section -->
+                <div id="videoPreviewSection" class="video-preview-section" style="display: none;">
+                    <div class="preview-header">
+                        <h4>Vista Previa</h4>
+                        <button class="btn-secondary" onclick="cancelVideoPreview()">Cambiar video</button>
+                    </div>
+                    <div class="preview-container">
+                        <video id="videoPreview" controls></video>
+                    </div>
+                    <div class="video-info">
+                        <div class="info-item">
+                            <span class="info-label">Archivo:</span>
+                            <span class="info-value" id="videoFileName"></span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Tamaño:</span>
+                            <span class="info-value" id="videoFileSize"></span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Duración:</span>
+                            <span class="info-value" id="videoDuration"></span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Resolución:</span>
+                            <span class="info-value" id="videoResolution"></span>
+                        </div>
+                    </div>
+                    <button class="btn-primary btn-analyze" onclick="startVideoAnalysis()">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="11" cy="11" r="8"></circle>
+                            <path d="M21 21l-4.35-4.35"></path>
+                        </svg>
+                        Iniciar Análisis
+                    </button>
+                </div>
+
                 <div id="videoAnalysisResult" style="display: none;"></div>
             </div>
         </div>
