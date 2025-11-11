@@ -1,0 +1,88 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Helper functions
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function isAdmin() {
+      return isAuthenticated() &&
+             get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
+    }
+
+    function isApproved() {
+      return isAuthenticated() &&
+             get(/databases/$(database)/documents/users/$(request.auth.uid)).data.approved == true;
+    }
+
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+
+    // Users collection
+    match /users/{userId} {
+      // Anyone authenticated can read their own user document
+      allow read: if isAuthenticated() && isOwner(userId);
+
+      // Admins can read all users
+      allow read: if isAdmin();
+
+      // New users can create their own document during signup
+      allow create: if isAuthenticated() &&
+                      isOwner(userId) &&
+                      request.resource.data.role == 'user' &&
+                      request.resource.data.approved == false;
+
+      // Users can update their own profile (except role and approved fields)
+      allow update: if isAuthenticated() &&
+                      isOwner(userId) &&
+                      request.resource.data.role == resource.data.role &&
+                      request.resource.data.approved == resource.data.approved;
+
+      // Admins can update any user (including role and approved)
+      allow update: if isAdmin();
+
+      // Only admins can delete users
+      allow delete: if isAdmin();
+    }
+
+    // Analyses collection (video analysis results)
+    match /analyses/{analysisId} {
+      // Authenticated and approved users can create their own analyses
+      allow create: if isAuthenticated() &&
+                      (isApproved() || isAdmin()) &&
+                      request.resource.data.uploaderUid == request.auth.uid &&
+                      request.resource.data.status == 'queued' &&
+                      request.resource.data.type == 'video';
+
+      // Users can read their own analyses
+      allow read: if isAuthenticated() &&
+                    (resource.data.uploaderUid == request.auth.uid || isAdmin());
+
+      // Users can update their own analyses (for status updates from backend)
+      // Backend should use Admin SDK, but if client needs to update:
+      allow update: if isAuthenticated() &&
+                      (resource.data.uploaderUid == request.auth.uid || isAdmin());
+
+      // Only admins can delete analyses
+      allow delete: if isAdmin();
+    }
+
+    // Apps collection
+    match /apps/{appId} {
+      // Anyone authenticated and approved can read apps
+      allow read: if isAuthenticated() && (isApproved() || isAdmin());
+
+      // Only admins can create, update, or delete apps
+      allow create, update, delete: if isAdmin();
+    }
+
+    // Default: deny all other access
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

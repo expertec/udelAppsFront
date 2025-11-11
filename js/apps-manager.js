@@ -4,18 +4,32 @@ import { collection, addDoc, serverTimestamp, doc, onSnapshot } from 'https://ww
 
 async function createAnalysisJobNoStore() {
   const user = auth.currentUser;
-  if (!user) throw new Error('No session');
+  if (!user) {
+    throw new Error('PERMISSION_DENIED: No hay sesión activa. Por favor, inicia sesión nuevamente.');
+  }
 
-  // Creamos el doc con status queued
-  const ref = await addDoc(collection(db, 'analyses'), {
-    type: 'video',
-    uploaderUid: user.uid,
-    institutionId: 'udl',
-    status: 'queued',
-    createdAt: serverTimestamp(),
-    updatedAt: serverTimestamp()
-  });
-  return ref.id;
+  try {
+    // Creamos el doc con status queued
+    const ref = await addDoc(collection(db, 'analyses'), {
+      type: 'video',
+      uploaderUid: user.uid,
+      institutionId: 'udl',
+      status: 'queued',
+      createdAt: serverTimestamp(),
+      updatedAt: serverTimestamp()
+    });
+    return ref.id;
+  } catch (error) {
+    console.error('Error creating analysis job:', error);
+
+    // Check for specific Firestore permission errors
+    if (error.code === 'permission-denied' || error.message?.includes('Missing or insufficient permissions')) {
+      throw new Error('PERMISSION_DENIED: Tu cuenta no tiene permisos para realizar análisis de video. Verifica que tu cuenta esté aprobada por un administrador.');
+    }
+
+    // Re-throw other errors
+    throw error;
+  }
 }
 
 function setVideoResult(html, status = 'info') {
@@ -314,6 +328,22 @@ window.handleVideoUpload = async function (evt) {
   let unsub = null; // Para poder limpiar el listener en caso de error
 
   try {
+    // Verificar autenticación antes de continuar
+    if (!auth.currentUser) {
+      showMessage('No hay sesión activa. Por favor, recarga la página e inicia sesión.', 'error');
+      setVideoResult(`
+        <div class="result-header error">
+          <div class="result-icon">🔒</div>
+          <h3 class="result-title">Sesión Expirada</h3>
+        </div>
+        <p class="error-message">Tu sesión ha expirado. Por favor, recarga la página e inicia sesión nuevamente.</p>
+        <button class="btn-primary" onclick="window.location.reload()" style="margin-top: 12px;">
+          Recargar Página
+        </button>
+      `, 'error');
+      return;
+    }
+
     // Validar el archivo antes de procesarlo
     const validation = await validateVideoFile(file);
     if (!validation.valid) {
@@ -488,24 +518,41 @@ window.handleVideoUpload = async function (evt) {
     console.error('Error en handleVideoUpload:', e);
 
     let userMessage = e.message;
-    if (e.message.includes('Failed to fetch')) {
+    let showReloadButton = false;
+
+    // Handle specific error types
+    if (e.message.includes('PERMISSION_DENIED')) {
+      userMessage = e.message.replace('PERMISSION_DENIED: ', '');
+      showReloadButton = true;
+    } else if (e.code === 'permission-denied' || e.message?.includes('Missing or insufficient permissions')) {
+      userMessage = 'Tu cuenta no tiene permisos para realizar análisis de video. Verifica que tu cuenta esté aprobada por un administrador.';
+      showReloadButton = true;
+    } else if (e.message.includes('Failed to fetch')) {
       userMessage = 'No se pudo conectar con el servidor. Verifica tu conexión a internet.';
     } else if (e.message.includes('NetworkError')) {
       userMessage = 'Error de red. Verifica tu conexión e intenta nuevamente.';
     } else if (e.message.includes('No session')) {
       userMessage = 'Tu sesión ha expirado. Por favor, inicia sesión nuevamente.';
+      showReloadButton = true;
     }
 
     showMessage(userMessage, 'error');
     setVideoResult(`
       <div class="result-header error">
         <div class="result-icon">✕</div>
-        <h3 class="result-title">Error</h3>
+        <h3 class="result-title">${showReloadButton ? 'Error de Permisos' : 'Error'}</h3>
       </div>
       <p class="error-message">${userMessage}</p>
-      <button class="btn-secondary" onclick="cancelVideoPreview()" style="margin-top: 12px;">
-        Intentar nuevamente
-      </button>
+      ${showReloadButton ? `
+        <button class="btn-primary" onclick="window.location.reload()" style="margin-top: 12px;">
+          Recargar Página
+        </button>
+      ` : `
+        <button class="btn-secondary" onclick="cancelVideoPreview()" style="margin-top: 12px;">
+          Intentar nuevamente
+        </button>
+      `}
+      ${e.code ? `<p class="error-hint" style="margin-top: 12px; font-size: 12px; color: #6b7280;">Código de error: ${e.code}</p>` : ''}
     `, 'error');
   }
 };
