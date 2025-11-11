@@ -1,0 +1,190 @@
+/* Responsive Design */
+
+/* Tablets */
+@media (max-width: 1024px) {
+    .apps-grid {
+        grid-template-columns: repeat(auto-fit, minmax(110px, 130px));
+        gap: 25px;
+    }
+
+    .app-icon {
+        width: 100px;
+        height: 100px;
+    }
+
+    .app-icon svg {
+        width: 45px;
+        height: 45px;
+    }
+}
+
+/* Móviles */
+@media (max-width: 768px) {
+    .navbar {
+        padding: 12px 20px;
+    }
+
+    .navbar h1 {
+        font-size: 18px;
+    }
+
+    .user-avatar {
+        width: 30px;
+        height: 30px;
+    }
+
+    .user-name {
+        font-size: 13px;
+    }
+
+    .user-badge {
+        font-size: 11px;
+        padding: 4px 10px;
+    }
+
+    .logout-btn {
+        padding: 6px 16px;
+        font-size: 13px;
+    }
+
+    .apps-desktop {
+        padding: 30px 15px;
+        min-height: calc(100vh - 60px);
+    }
+
+    .apps-grid {
+        grid-template-columns: repeat(auto-fit, minmax(90px, 110px));
+        gap: 20px;
+        padding: 10px;
+    }
+
+    .app-icon {
+        width: 85px;
+        height: 85px;
+        border-radius: 18px;
+    }
+
+    .app-icon svg {
+        width: 40px;
+        height: 40px;
+    }
+
+    .app-name {
+        font-size: 12px;
+    }
+
+    .app-modal {
+        padding: 10px;
+    }
+
+    .app-modal-content {
+        max-height: 95vh;
+        border-radius: 16px;
+    }
+
+    .app-modal-header {
+        padding: 16px 20px;
+    }
+
+    .app-modal-title {
+        font-size: 16px;
+    }
+
+    .app-modal-close {
+        width: 32px;
+        height: 32px;
+        font-size: 20px;
+    }
+
+    .app-modal-body {
+        padding: 20px 20px;
+    }
+
+    .upload-zone {
+        padding: 40px 15px;
+        border-width: 2px;
+    }
+
+    .upload-icon {
+        width: 50px;
+        height: 50px;
+    }
+
+    .upload-text {
+        font-size: 14px;
+    }
+
+    .upload-hint {
+        font-size: 12px;
+    }
+
+    .result-icon {
+        width: 36px;
+        height: 36px;
+    }
+
+    .result-icon svg {
+        width: 18px;
+        height: 18px;
+    }
+
+    .result-title {
+        font-size: 16px;
+    }
+
+    .result-content {
+        font-size: 13px;
+    }
+
+    .analysis-result {
+        padding: 20px;
+    }
+
+    .table {
+        font-size: 14px;
+    }
+
+    .table th,
+    .table td {
+        padding: 10px;
+    }
+
+    .action-buttons {
+        flex-direction: column;
+    }
+
+    .navbar-right {
+        gap: 10px;
+    }
+}
+
+/* Móviles pequeños */
+@media (max-width: 480px) {
+    .apps-grid {
+        grid-template-columns: repeat(auto-fit, minmax(80px, 95px));
+        gap: 18px;
+    }
+
+    .app-icon {
+        width: 75px;
+        height: 75px;
+        border-radius: 16px;
+    }
+
+    .app-icon svg {
+        width: 35px;
+        height: 35px;
+    }
+
+    .app-name {
+        font-size: 11px;
+    }
+
+    .app-modal-body {
+        padding: 15px;
+    }
+
+    .upload-zone {
+        padding: 30px 15px;
+    }
+}

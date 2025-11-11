@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Sistema CRUD</title>
+    <link rel="stylesheet" href="css/dashboard.css">
+    <link rel="stylesheet" href="css/apps.css">
+    <link rel="stylesheet" href="css/modals.css">
+    <link rel="stylesheet" href="css/responsive.css">
+</head>
+<body>
+    <nav class="navbar">
+        <h1>🔐 Dashboard CRUD</h1>
+        <div class="navbar-right">
+            <div class="user-info">
+                <img id="userAvatar" class="user-avatar hidden" alt="Avatar">
+                <span id="userName" class="user-name"></span>
+                <span id="userRole" class="user-badge"></span>
+            </div>
+            <button class="logout-btn" onclick="logout()">Cerrar Sesión</button>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="welcome-card">
+            <h2 id="welcomeTitle">Cargando...</h2>
+            <p id="welcomeDescription"></p>
+        </div>
+
+        <div id="message" class="message"></div>
+
+        <!-- Vista de Usuario Normal -->
+        <div id="userView" class="hidden">
+            <div class="apps-desktop">
+                <div class="apps-grid">
+                    <!-- App 1: Analizador de Videos -->
+                    <div class="app-card" onclick="openVideoAnalyzer()">
+                        <div class="app-icon" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
+                            <svg width="50" height="50" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <polygon points="5 3 19 12 5 21 5 3"></polygon>
+                            </svg>
+                        </div>
+                        <h3 class="app-name">Analizador de Videos</h3>
+                    </div>
+
+                    <!-- App 2: Analizador de Carta Descriptiva -->
+                    <div class="app-card" onclick="openCartaAnalyzer()">
+                        <div class="app-icon" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">
+                            <svg width="50" height="50" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                                <polyline points="14 2 14 8 20 8"></polyline>
+                                <line x1="16" y1="13" x2="8" y2="13"></line>
+                                <line x1="16" y1="17" x2="8" y2="17"></line>
+                                <polyline points="10 9 9 9 8 9"></polyline>
+                            </svg>
+                        </div>
+                        <h3 class="app-name">Carta Descriptiva</h3>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Vista de Admin -->
+        <div id="adminView" class="hidden">
+            <!-- Gestión de Usuarios Pendientes -->
+            <div class="section">
+                <div class="section-header">
+                    <h3>👥 Usuarios Pendientes de Aprobación</h3>
+                </div>
+                <div id="pendingUsersContainer"></div>
+            </div>
+
+            <!-- Gestión de Todos los Usuarios -->
+            <div class="section">
+                <div class="section-header">
+                    <h3>👥 Todos los Usuarios</h3>
+                </div>
+                <div id="allUsersContainer"></div>
+            </div>
+
+            <!-- Gestión de Items -->
+            <div class="section">
+                <div class="section-header">
+                    <h3>📝 Todos los Items</h3>
+                    <button class="btn-primary" onclick="openItemModal()">➕ Nuevo Item</button>
+                </div>
+                <div id="allItemsContainer"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal: Analizador de Videos -->
+    <div id="videoAnalyzerModal" class="app-modal">
+        <div class="app-modal-content">
+            <div class="app-modal-header">
+                <h3 class="app-modal-title">Analizador de Videos</h3>
+                <button class="app-modal-close" onclick="closeVideoAnalyzer()">×</button>
+            </div>
+            <div class="app-modal-body">
+                <div class="upload-zone" id="videoUploadZone" onclick="document.getElementById('videoFileInput').click()">
+                    <svg class="upload-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                        <polyline points="17 8 12 3 7 8"></polyline>
+                        <line x1="12" y1="3" x2="12" y2="15"></line>
+                    </svg>
+                    <p class="upload-text">Arrastra tu video aquí o haz clic para seleccionar</p>
+                    <p class="upload-hint">Formatos soportados: MP4, AVI, MOV, MKV</p>
+                    <input type="file" id="videoFileInput" class="file-input-hidden" accept="video/*" onchange="handleVideoUpload(event)">
+                </div>
+                <div id="videoAnalysisResult" style="display: none;"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal: Analizador de Carta Descriptiva -->
+    <div id="cartaAnalyzerModal" class="app-modal">
+        <div class="app-modal-content">
+            <div class="app-modal-header">
+                <h3 class="app-modal-title">Analizador de Carta Descriptiva</h3>
+                <button class="app-modal-close" onclick="closeCartaAnalyzer()">×</button>
+            </div>
+            <div class="app-modal-body">
+                <div class="upload-zone" id="cartaUploadZone" onclick="document.getElementById('cartaFileInput').click()">
+                    <svg class="upload-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M14 2H6a2 2 0 0 1-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                        <polyline points="14 2 14 8 20 8"></polyline>
+                    </svg>
+                    <p class="upload-text">Arrastra tu carta descriptiva aquí o haz clic para seleccionar</p>
+                    <p class="upload-hint">Formatos soportados: PDF, DOC, DOCX</p>
+                    <input type="file" id="cartaFileInput" class="file-input-hidden" accept=".pdf,.doc,.docx" onchange="handleCartaUpload(event)">
+                </div>
+                <div id="cartaAnalysisResult" style="display: none;"></div>
+            </div>
+        </div>
+    </div>
+
+    <script type="module" src="js/dashboard-init.js"></script>
+    <script type="module" src="js/apps-manager.js"></script>
+</body>
+</html>
