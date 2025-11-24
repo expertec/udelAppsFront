@@ -8,10 +8,227 @@
     <link rel="stylesheet" href="css/apps.css">
     <link rel="stylesheet" href="css/modals.css">
     <link rel="stylesheet" href="css/responsive.css">
+    <style>
+        /* Estilos adicionales para resultados del análisis */
+        .analysis-results {
+            margin-top: 20px;
+        }
+        .score-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 24px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        .score-value {
+            font-size: 48px;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+        .score-label {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+        .vimeo-action {
+            margin-top: 20px;
+            padding: 20px;
+            background: #f0f9ff;
+            border: 2px solid #0ea5e9;
+            border-radius: 8px;
+        }
+        .vimeo-action.success {
+            background: #f0fdf4;
+            border-color: #22c55e;
+        }
+        .vimeo-action h4 {
+            margin: 0 0 12px 0;
+            color: #0c4a6e;
+        }
+        .btn-vimeo {
+            background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%);
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+        }
+        .btn-vimeo:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(14, 165, 233, 0.4);
+        }
+        .btn-vimeo:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            background: #94a3b8;
+            position: relative;
+        }
+        .btn-vimeo:disabled:hover::after {
+            content: attr(data-tooltip);
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #1e293b;
+            color: white;
+            padding: 8px 12px;
+            border-radius: 6px;
+            white-space: nowrap;
+            font-size: 12px;
+            margin-bottom: 8px;
+            z-index: 1000;
+        }
+        .btn-vimeo.uploading {
+            background: #94a3b8;
+        }
+        .findings-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 16px;
+            margin: 20px 0;
+        }
+        .finding-card {
+            background: white;
+            border-radius: 8px;
+            padding: 16px;
+            border-left: 4px solid #94a3b8;
+        }
+        .finding-card.ok {
+            border-left-color: #22c55e;
+        }
+        .finding-card.warning {
+            border-left-color: #f59e0b;
+        }
+        .finding-card.error {
+            border-left-color: #ef4444;
+        }
+        .finding-title {
+            font-weight: 600;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .finding-score {
+            font-size: 20px;
+            font-weight: bold;
+            color: #64748b;
+        }
+        .finding-note {
+            font-size: 14px;
+            color: #64748b;
+            margin-top: 8px;
+        }
+        .suggestions-section {
+            background: #fffbeb;
+            border: 2px solid #fbbf24;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        .suggestions-section h4 {
+            margin: 0 0 12px 0;
+            color: #92400e;
+        }
+        .suggestions-section ul {
+            margin: 0;
+            padding-left: 20px;
+        }
+        .suggestions-section li {
+            margin-bottom: 8px;
+            color: #78350f;
+        }
+        .spinner {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 2px solid rgba(255,255,255,0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 0.6s linear infinite;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        .vimeo-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            color: #0ea5e9;
+            font-weight: 600;
+            text-decoration: none;
+            margin-top: 12px;
+        }
+        .vimeo-link:hover {
+            text-decoration: underline;
+        }
+
+        /* Estilos para autocomplete */
+        .autocomplete-suggestions {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: white;
+            border: 2px solid #e5e7eb;
+            border-top: none;
+            border-radius: 0 0 8px 8px;
+            max-height: 300px;
+            overflow-y: auto;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            z-index: 1000;
+            margin-top: -8px;
+        }
+
+        .autocomplete-suggestion {
+            padding: 12px 16px;
+            cursor: pointer;
+            border-bottom: 1px solid #f3f4f6;
+            font-size: 14px;
+            color: #374151;
+            transition: background 0.15s ease;
+        }
+
+        .autocomplete-suggestion:last-child {
+            border-bottom: none;
+        }
+
+        .autocomplete-suggestion:hover,
+        .autocomplete-suggestion.selected {
+            background: #f3f4f6;
+        }
+
+        .autocomplete-suggestion mark {
+            background: #fef3c7;
+            color: #92400e;
+            font-weight: 600;
+            padding: 2px 0;
+        }
+
+        .autocomplete-no-results {
+            padding: 16px;
+            text-align: center;
+            color: #6b7280;
+            font-size: 14px;
+        }
+
+        .autocomplete-loading {
+            padding: 16px;
+            text-align: center;
+            color: #6b7280;
+            font-size: 14px;
+        }
+    </style>
 </head>
 <body>
     <nav class="navbar">
-        <h1>🔐 Dashboard CRUD</h1>
+        <h1>UDEL Mentores</h1>
         <div class="navbar-right">
             <div class="user-info">
                 <img id="userAvatar" class="user-avatar hidden" alt="Avatar">
@@ -33,36 +250,90 @@
         <!-- Vista de Usuario Normal -->
         <div id="userView" class="hidden">
             <div class="apps-desktop">
-                <div class="apps-grid">
-                    <!-- App 1: Analizador de Videos -->
-                    <div class="app-card" onclick="openVideoAnalyzer()">
-                        <div class="app-icon" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
-                            <svg width="50" height="50" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                <polygon points="5 3 19 12 5 21 5 3"></polygon>
-                            </svg>
-                        </div>
-                        <h3 class="app-name">Analizador de Videos</h3>
-                    </div>
-
-                    <!-- App 2: Analizador de Carta Descriptiva -->
-                    <div class="app-card" onclick="openCartaAnalyzer()">
-                        <div class="app-icon" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">
-                            <svg width="50" height="50" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-                                <polyline points="14 2 14 8 20 8"></polyline>
-                                <line x1="16" y1="13" x2="8" y2="13"></line>
-                                <line x1="16" y1="17" x2="8" y2="17"></line>
-                                <polyline points="10 9 9 9 8 9"></polyline>
-                            </svg>
-                        </div>
-                        <h3 class="app-name">Carta Descriptiva</h3>
-                    </div>
+                <div class="apps-grid" id="appsGrid">
+                    <!-- Las aplicaciones se cargarán dinámicamente según el rol del usuario -->
                 </div>
             </div>
         </div>
 
         <!-- Vista de Admin -->
         <div id="adminView" class="hidden">
+            <!-- Panel de Creación de Usuarios (solo superAdmin) -->
+            <div id="userCreationPanel" class="section hidden">
+                <div class="section-header">
+                    <h3>➕ Crear Nuevo Usuario</h3>
+                </div>
+                <div style="background: white; padding: 24px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+                    <form id="createUserForm">
+                        <div class="form-group">
+                            <label for="userEmail">Correo Electrónico *</label>
+                            <input type="email" id="userEmail" required placeholder="usuario@universidad.mx">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="userPassword">Contraseña *</label>
+                            <input type="password" id="userPassword" required placeholder="Mínimo 6 caracteres" minlength="6">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="newUserRole">Rol *</label>
+                            <select id="newUserRole" required onchange="toggleUserFields()">
+                                <option value="">Selecciona un rol</option>
+                                <option value="superAdmin">Super Administrador</option>
+                                <option value="director">Director</option>
+                                <option value="mentor">Mentor</option>
+                            </select>
+                        </div>
+
+                        <div id="additionalFields" class="hidden">
+                            <div class="form-group">
+                                <label for="newUserName">Nombre *</label>
+                                <input type="text" id="newUserName" placeholder="Ej: Juan">
+                            </div>
+
+                            <div class="form-group">
+                                <label for="newUserLastName">Apellido *</label>
+                                <input type="text" id="newUserLastName" placeholder="Ej: Pérez">
+                            </div>
+
+                            <div class="form-group">
+                                <label for="newUserPlantel">Plantel *</label>
+                                <select id="newUserPlantel">
+                                    <option value="">Selecciona un plantel</option>
+                                    <!-- Planteles se cargarán dinámicamente -->
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="newUserCiudad">Ciudad *</label>
+                                <input type="text" id="newUserCiudad" placeholder="Ej: Guadalajara">
+                            </div>
+
+                            <div class="form-group">
+                                <label for="newUserWhatsapp">WhatsApp *</label>
+                                <input type="tel" id="newUserWhatsapp" placeholder="Ej: +52 33 1234 5678">
+                            </div>
+                        </div>
+
+                        <div style="display: flex; gap: 12px; margin-top: 24px;">
+                            <button type="submit" class="btn-primary" style="flex: 1;">Crear Usuario</button>
+                            <button type="button" class="btn-secondary" onclick="resetUserForm()">Limpiar</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Gestión de Planteles (solo superAdmin) -->
+            <div id="plantelesPanel" class="section hidden">
+                <div class="section-header">
+                    <h3>🏫 Gestionar Planteles</h3>
+                    <button class="btn-primary" onclick="openPlantelModal()">➕ Nuevo Plantel</button>
+                </div>
+                <div id="plantelesContainer" style="background: white; padding: 24px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+                    <!-- Los planteles se cargarán dinámicamente aquí -->
+                </div>
+            </div>
+
             <!-- Gestión de Usuarios Pendientes -->
             <div class="section">
                 <div class="section-header">
@@ -95,7 +366,15 @@
         <div class="app-modal-content">
             <div class="app-modal-header">
                 <h3 class="app-modal-title">Analizador de Videos</h3>
-                <button class="app-modal-close" onclick="closeVideoAnalyzer()">×</button>
+                <div style="display: flex; align-items: center; gap: 12px;">
+                    <button id="btnVimeoHeader" class="btn-vimeo" style="display: inline-flex; background: #94a3b8 !important;" disabled>
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M23.977 6.416c-.105 2.338-1.739 5.543-4.894 9.609-3.268 4.247-6.026 6.37-8.29 6.37-1.409 0-2.578-1.294-3.553-3.881L5.322 11.4C4.603 8.816 3.834 7.522 3.01 7.522c-.179 0-.806.378-1.881 1.132L0 7.197a315.065 315.065 0 0 0 3.501-3.128C5.08 2.701 6.266 1.984 7.055 1.91c1.867-.18 3.016 1.1 3.447 3.838.465 2.953.789 4.789.971 5.507.537 2.45 1.131 3.674 1.776 3.674.502 0 1.256-.796 2.265-2.385 1.004-1.589 1.54-2.797 1.612-3.628.144-1.371-.395-2.061-1.614-2.061-.574 0-1.167.121-1.777.391 1.186-3.868 3.434-5.757 6.762-5.637 2.473.06 3.628 1.664 3.493 4.797l-.013.01z"/>
+                        </svg>
+                        Esperando análisis.
+                    </button>
+                    <button class="app-modal-close" onclick="closeVideoAnalyzer()">×</button>
+                </div>
             </div>
             <div class="app-modal-body">
                 <div class="upload-zone" id="videoUploadZone" onclick="document.getElementById('videoFileInput').click()">
@@ -105,7 +384,7 @@
                         <line x1="12" y1="3" x2="12" y2="15"></line>
                     </svg>
                     <p class="upload-text">Arrastra tu video aquí o haz clic para seleccionar</p>
-                    <p class="upload-hint">Formatos soportados: MP4, AVI, MOV, MKV</p>
+                    <p class="upload-hint">Formatos soportados: MP4, AVI, MOV, MKV (máx. 500MB)</p>
                     <input type="file" id="videoFileInput" class="file-input-hidden" accept="video/*" onchange="handleVideoSelection(event)">
                 </div>
 
@@ -145,7 +424,7 @@
                     </button>
                 </div>
 
-                <div id="videoAnalysisResult" style="display: none;"></div>
+                <div id="videoAnalysisResult" class="analysis-results" style="display: none;"></div>
             </div>
         </div>
     </div>
@@ -154,24 +433,764 @@
     <div id="cartaAnalyzerModal" class="app-modal">
         <div class="app-modal-content">
             <div class="app-modal-header">
-                <h3 class="app-modal-title">Analizador de Carta Descriptiva</h3>
+                <h3 class="app-modal-title">Generador de Carta Descriptiva</h3>
                 <button class="app-modal-close" onclick="closeCartaAnalyzer()">×</button>
             </div>
             <div class="app-modal-body">
-                <div class="upload-zone" id="cartaUploadZone" onclick="document.getElementById('cartaFileInput').click()">
-                    <svg class="upload-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M14 2H6a2 2 0 0 1-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-                        <polyline points="14 2 14 8 20 8"></polyline>
-                    </svg>
-                    <p class="upload-text">Arrastra tu carta descriptiva aquí o haz clic para seleccionar</p>
-                    <p class="upload-hint">Formatos soportados: PDF, DOC, DOCX</p>
-                    <input type="file" id="cartaFileInput" class="file-input-hidden" accept=".pdf,.doc,.docx" onchange="handleCartaUpload(event)">
+                <!-- Sección de Generación -->
+                <div id="cartaGeneratorSection">
+                    <div class="form-group">
+                        <label for="temaDescription" style="display: block; margin-bottom: 8px; font-weight: 600; color: #374151;">
+                            Descripción del Tema de la Clase
+                        </label>
+                        <textarea
+                            id="temaDescription"
+                            placeholder="Describe el tema principal de tu clase, incluyendo objetivos de aprendizaje, contenido clave y metodología..."
+                            style="width: 100%; min-height: 120px; padding: 12px; border: 2px solid #e5e7eb; border-radius: 8px; font-family: inherit; font-size: 14px; resize: vertical;"
+                        ></textarea>
+                    </div>
+                    <button class="btn-primary" onclick="generateCartaDescriptiva()" style="width: 100%; margin-top: 16px;">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 8px;">
+                            <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"></path>
+                        </svg>
+                        Generar Carta Descriptiva (100% Garantizado)
+                    </button>
                 </div>
+
+                <!-- Sección de Análisis Manual (oculta inicialmente) -->
+                <div id="cartaUploadSection" style="display: none;">
+                    <div class="upload-zone" id="cartaUploadZone" onclick="document.getElementById('cartaFileInput').click()">
+                        <svg class="upload-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M14 2H6a2 2 0 0 1-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                            <polyline points="14 2 14 8 20 8"></polyline>
+                        </svg>
+                        <p class="upload-text">Arrastra tu carta descriptiva aquí o haz clic para seleccionar</p>
+                        <p class="upload-hint">Formatos soportados: PDF, DOC, DOCX</p>
+                        <input type="file" id="cartaFileInput" class="file-input-hidden" accept=".pdf,.doc,.docx" onchange="handleCartaUpload(event)">
+                    </div>
+                    <button class="btn-secondary" onclick="showCartaGenerator()" style="width: 100%; margin-top: 12px;">
+                        ← Volver a Generador
+                    </button>
+                </div>
+
                 <div id="cartaAnalysisResult" style="display: none;"></div>
             </div>
         </div>
     </div>
 
+    <!-- Modal: Buscador de Clases -->
+    <div id="claseFinderModal" class="app-modal">
+        <div class="app-modal-content">
+            <div class="app-modal-header">
+                <h3 class="app-modal-title">Buscador de Clases</h3>
+                <button class="app-modal-close" onclick="closeClaseFinder()">×</button>
+            </div>
+            <div class="app-modal-body">
+                <div class="search-section">
+                    <div class="form-group">
+                        <label for="claseSearchInput" style="display: block; margin-bottom: 8px; font-weight: 600; color: #374151;">
+                            Buscar materia por nombre
+                        </label>
+                        <div style="display: flex; gap: 12px; position: relative;">
+                            <div style="flex: 1; position: relative;">
+                                <input
+                                    type="text"
+                                    id="claseSearchInput"
+                                    placeholder="Ej: Psicología, Biología, Métodos..."
+                                    autocomplete="off"
+                                    style="width: 100%; padding: 12px; border: 2px solid #e5e7eb; border-radius: 8px; font-family: inherit; font-size: 14px;"
+                                />
+                                <div id="claseSearchSuggestions" class="autocomplete-suggestions" style="display: none;"></div>
+                            </div>
+                            <button class="btn-primary" onclick="searchClases()" style="padding: 12px 24px;">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 8px;">
+                                    <circle cx="11" cy="11" r="8"></circle>
+                                    <path d="M21 21l-4.35-4.35"></path>
+                                </svg>
+                                Buscar
+                            </button>
+                        </div>
+                        <p style="margin-top: 8px; font-size: 12px; color: #6b7280;">
+                            Escribe al menos 2 caracteres para ver sugerencias. Los resultados mostrarán el enlace a Dropbox si está disponible.
+                        </p>
+                    </div>
+                </div>
+
+                <div id="claseSearchResults" style="display: none;"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal: Crear/Editar Plantel -->
+    <div id="plantelModal" class="app-modal">
+        <div class="app-modal-content" style="max-width: 500px;">
+            <div class="app-modal-header">
+                <h3 class="app-modal-title" id="plantelModalTitle">Nuevo Plantel</h3>
+                <button class="app-modal-close" onclick="closePlantelModal()">×</button>
+            </div>
+            <div class="app-modal-body">
+                <form id="plantelForm">
+                    <div class="form-group">
+                        <label for="plantelName">Nombre del Plantel *</label>
+                        <input type="text" id="plantelName" required placeholder="Ej: Plantel Centro, Campus Norte, Sede Guadalajara">
+                    </div>
+
+                    <div style="display: flex; gap: 12px; margin-top: 24px;">
+                        <button type="submit" class="btn-primary" style="flex: 1;">Guardar Plantel</button>
+                        <button type="button" class="btn-secondary" onclick="closePlantelModal()">Cancelar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+<script>
+  window.API_BASE = 'https://udelapps.onrender.com';
+
+  // Función para mostrar/ocultar campos adicionales según el rol
+  window.toggleUserFields = function() {
+    const roleSelect = document.getElementById('newUserRole');
+    const role = roleSelect ? roleSelect.value : '';
+    const additionalFields = document.getElementById('additionalFields');
+    const nameField = document.getElementById('newUserName');
+    const lastNameField = document.getElementById('newUserLastName');
+    const plantelField = document.getElementById('newUserPlantel');
+    const ciudadField = document.getElementById('newUserCiudad');
+    const whatsappField = document.getElementById('newUserWhatsapp');
+
+    console.log('🎯 toggleUserFields - Rol seleccionado:', role);
+
+    if (role === 'director' || role === 'mentor') {
+      additionalFields.classList.remove('hidden');
+      nameField.required = true;
+      lastNameField.required = true;
+      plantelField.required = true;
+      ciudadField.required = true;
+      whatsappField.required = true;
+
+      // Cargar planteles al mostrar los campos
+      window.loadPlantelesDropdown();
+    } else {
+      additionalFields.classList.add('hidden');
+      nameField.required = false;
+      lastNameField.required = false;
+      plantelField.required = false;
+      ciudadField.required = false;
+      whatsappField.required = false;
+    }
+  };
+
+  // Función para limpiar el formulario
+  window.resetUserForm = function() {
+    document.getElementById('createUserForm').reset();
+    document.getElementById('additionalFields').classList.add('hidden');
+  };
+
+  // Funciones para modal de planteles
+  window.openPlantelModal = function() {
+    document.getElementById('plantelModalTitle').textContent = 'Nuevo Plantel';
+    document.getElementById('plantelForm').reset();
+    document.getElementById('plantelModal').classList.add('open');
+  };
+
+  window.closePlantelModal = function() {
+    document.getElementById('plantelModal').classList.remove('open');
+    document.getElementById('plantelForm').reset();
+  };
+</script>
+
+<script type="module">
+console.log('🚀 SCRIPT CARGADO - dashboard.html v2.0');
+
+/* ==========
+   Imports Firebase
+   ========== */
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.13.1/firebase-app.js';
+import { getFirestore, doc, onSnapshot } from 'https://www.gstatic.com/firebasejs/10.13.1/firebase-firestore.js';
+import { firebaseConfig } from './js/firebase-config.js';
+
+// Inicializar Firebase
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+window.db = db; // Exponer para otros scripts
+
+/* ==========
+   Estado local
+   ========== */
+let selectedFile = null;
+let objectUrl = null;
+let currentAnalysisId = null;
+let firestoreUnsubscribe = null;
+
+/* ==========
+   Utils DOM
+   ========== */
+const $ = (sel) => document.querySelector(sel);
+const $$ = (sel) => Array.from(document.querySelectorAll(sel));
+
+function fmtBytes(bytes = 0) {
+  if (!bytes && bytes !== 0) return '';
+  const units = ['B','KB','MB','GB','TB'];
+  let i = 0;
+  let v = bytes;
+  while (v >= 1024 && i < units.length - 1) { v /= 1024; i++; }
+  return `${v.toFixed(1)} ${units[i]}`;
+}
+
+function show(el) { if (el) el.style.display = ''; }
+function hide(el) { if (el) el.style.display = 'none'; }
+function setText(sel, txt) { const el = $(sel); if (el) el.textContent = txt ?? ''; }
+
+/* ==========
+   Modales
+   ========== */
+window.openVideoAnalyzer = function openVideoAnalyzer() {
+  $('#videoAnalyzerModal')?.classList.add('open');
+};
+
+window.closeVideoAnalyzer = function closeVideoAnalyzer() {
+  $('#videoAnalyzerModal')?.classList.remove('open');
+  cancelVideoPreview();
+  if (firestoreUnsubscribe) {
+    firestoreUnsubscribe();
+    firestoreUnsubscribe = null;
+  }
+};
+
+window.openCartaAnalyzer = function openCartaAnalyzer() {
+  $('#cartaAnalyzerModal')?.classList.add('open');
+};
+window.closeCartaAnalyzer = function closeCartaAnalyzer() {
+  $('#cartaAnalyzerModal')?.classList.remove('open');
+};
+
+/* ==========
+   Video: selección & preview
+   ========== */
+window.handleVideoSelection = async function handleVideoSelection(evt) {
+  try {
+    const file = evt?.target?.files?.[0];
+    if (!file) return;
+
+    // Validaciones básicas
+    if (!file.type.startsWith('video/')) {
+      alert('Selecciona un archivo de video válido.');
+      return;
+    }
+    const maxBytes = 500 * 1024 * 1024; // 500MB
+    if (file.size > maxBytes) {
+      alert('El video supera 500 MB. Por favor, selecciona un archivo más pequeño.');
+      return;
+    }
+
+    selectedFile = file;
+
+    // Preview
+    const video = $('#videoPreview');
+    const secPreview = $('#videoPreviewSection');
+
+    if (objectUrl) URL.revokeObjectURL(objectUrl);
+    objectUrl = URL.createObjectURL(file);
+    video.src = objectUrl;
+
+    // Datos de archivo
+    setText('#videoFileName', file.name);
+    setText('#videoFileSize', fmtBytes(file.size));
+
+    // Esperar metadata para duración y resolución
+    await new Promise((res) => {
+      video.onloadedmetadata = () => res();
+      setTimeout(res, 1500); // iOS fallback
+    });
+
+    const duration = video.duration || 0;
+    const w = video.videoWidth || 0;
+    const h = video.videoHeight || 0;
+
+    const mm = Math.floor(duration / 60);
+    const ss = Math.round(duration % 60);
+    setText('#videoDuration', `${mm}:${String(ss).padStart(2,'0')}`);
+    setText('#videoResolution', w && h ? `${w}×${h}` : '—');
+
+    show(secPreview);
+    hide($('#videoAnalysisResult'));
+  } catch (err) {
+    console.error(err);
+    alert('No pudimos cargar la vista previa del video.');
+  }
+};
+
+window.cancelVideoPreview = function cancelVideoPreview() {
+  const video = $('#videoPreview');
+  if (video) {
+    video.pause();
+    video.removeAttribute('src');
+    video.load?.();
+  }
+  if (objectUrl) {
+    URL.revokeObjectURL(objectUrl);
+    objectUrl = null;
+  }
+  selectedFile = null;
+  currentAnalysisId = null;
+  hide($('#videoPreviewSection'));
+  hide($('#videoAnalysisResult'));
+  hide($('#btnVimeoHeader'));
+  const input = $('#videoFileInput');
+  if (input) input.value = '';
+  
+  if (firestoreUnsubscribe) {
+    firestoreUnsubscribe();
+    firestoreUnsubscribe = null;
+  }
+};
+
+/* ==========
+   Análisis de video
+   ========== */
+function genAnalysisId() {
+  return 'an_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2, 10);
+}
+
+async function postAnalyzeVideo(analysisId, file) {
+  const form = new FormData();
+  form.append('file', file);
+  form.append('analysisId', analysisId);
+
+  const res = await fetch(`${window.API_BASE}/analyzeVideo`, {
+    method: 'POST',
+    body: form
+  });
+
+  if (!res.ok) {
+    const text = await res.text().catch(() => '');
+    throw new Error(`Error ${res.status}: ${text || 'falló el análisis'}`);
+  }
+  return res.json();
+}
+
+function renderWaiting(analysisId) {
+  const box = $('#videoAnalysisResult');
+  if (!box) return;
+  box.innerHTML = `
+    <div class="result-card">
+      <h4>⏳ Analizando video...</h4>
+      <p>ID de análisis: <code>${analysisId}</code></p>
+      <p style="color: #64748b; margin-top: 16px;">
+        El servidor está procesando tu video con Gemini AI. 
+        Los resultados aparecerán automáticamente cuando el análisis termine.
+      </p>
+      <div style="text-align: center; margin-top: 20px;">
+        <div class="spinner"></div>
+      </div>
+    </div>
+  `;
+  show(box);
+}
+
+window.startVideoAnalysis = async function startVideoAnalysis() {
+  try {
+    if (!selectedFile) {
+      alert('Selecciona un video primero.');
+      return;
+    }
+
+    const analysisId = genAnalysisId();
+    currentAnalysisId = analysisId;
+
+    const btn = document.querySelector('.btn-analyze');
+    btn?.setAttribute('disabled', 'disabled');
+    btn?.classList.add('is-loading');
+
+    // Enviar al backend
+    await postAnalyzeVideo(analysisId, selectedFile);
+
+    // Mostrar estado de espera
+    renderWaiting(analysisId);
+
+    // Iniciar listener de Firestore
+    beginFirestoreListener(analysisId);
+
+  } catch (err) {
+    console.error(err);
+    alert(err.message || 'Ocurrió un error al iniciar el análisis.');
+    const btn = document.querySelector('.btn-analyze');
+    btn?.removeAttribute('disabled');
+    btn?.classList.remove('is-loading');
+  }
+};
+
+/* ==========
+   Listener de Firestore
+   ========== */
+function beginFirestoreListener(analysisId) {
+  try {
+    const ref = doc(db, 'analyses', analysisId);
+    
+    firestoreUnsubscribe = onSnapshot(ref, (snap) => {
+      if (!snap.exists()) return;
+      
+      const data = snap.data();
+      
+      if (data.status === 'done' && data.result) {
+        renderAnalysisResults(analysisId, data);
+        
+        // Desactivar botón de análisis
+        const btn = document.querySelector('.btn-analyze');
+        btn?.removeAttribute('disabled');
+        btn?.classList.remove('is-loading');
+      } else if (data.status === 'error') {
+        renderAnalysisError(data.error);
+        
+        const btn = document.querySelector('.btn-analyze');
+        btn?.removeAttribute('disabled');
+        btn?.classList.remove('is-loading');
+      }
+    });
+  } catch (e) {
+    console.error('No se pudo iniciar el listener de Firestore:', e);
+  }
+}
+
+/* ==========
+   Renderizar resultados
+   ========== */
+function renderAnalysisResults(analysisId, data) {
+  console.log('🟢 renderAnalysisResults llamada con data:', data);
+  
+  const box = $('#videoAnalysisResult');
+  if (!box) return;
+
+  const result = data.result;
+  const score = result.score || 0;
+  const qualifiesForVimeo = data.qualifiesForVimeo || false;
+  const vimeoStatus = data.vimeoStatus;
+  const threshold = data.scoreThreshold || 10;
+
+  console.log('📊 Datos extraídos:', { score, qualifiesForVimeo, vimeoStatus, threshold });
+
+  // Actualizar botón del header
+  console.log('🔄 Llamando a updateVimeoHeaderButton...');
+  updateVimeoHeaderButton(analysisId, qualifiesForVimeo, vimeoStatus, score, threshold, data.vimeoLink);
+
+  let html = `
+    <div class="score-card">
+      <div class="score-label">Puntuación General</div>
+      <div class="score-value">${score.toFixed(1)}%</div>
+      <div class="score-label">
+        ${qualifiesForVimeo ? '✅ Cumple con el estándar de calidad' : '⚠️ No alcanza el estándar mínimo (80%)'}
+      </div>
+    </div>
+  `;
+
+  // Resumen
+  if (result.summary) {
+    html += `
+      <div class="result-card">
+        <h4>📝 Resumen</h4>
+        <p>${result.summary}</p>
+      </div>
+    `;
+  }
+
+  // Botón de Vimeo (siempre visible, deshabilitado si no califica)
+  if (vimeoStatus === 'uploaded' && data.vimeoLink) {
+    // Ya fue subido exitosamente
+    html += `
+      <div class="vimeo-action success">
+        <h4>✅ Video subido a Vimeo</h4>
+        <p>Tu video ha sido publicado exitosamente en Vimeo.</p>
+        <div style="display: flex; gap: 12px; margin-top: 12px;">
+          <a href="${data.vimeoLink}" target="_blank" class="vimeo-link">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M23.977 6.416c-.105 2.338-1.739 5.543-4.894 9.609-3.268 4.247-6.026 6.37-8.29 6.37-1.409 0-2.578-1.294-3.553-3.881L5.322 11.4C4.603 8.816 3.834 7.522 3.01 7.522c-.179 0-.806.378-1.881 1.132L0 7.197a315.065 315.065 0 0 0 3.501-3.128C5.08 2.701 6.266 1.984 7.055 1.91c1.867-.18 3.016 1.1 3.447 3.838.465 2.953.789 4.789.971 5.507.537 2.45 1.131 3.674 1.776 3.674.502 0 1.256-.796 2.265-2.385 1.004-1.589 1.54-2.797 1.612-3.628.144-1.371-.395-2.061-1.614-2.061-.574 0-1.167.121-1.777.391 1.186-3.868 3.434-5.757 6.762-5.637 2.473.06 3.628 1.664 3.493 4.797l-.013.01z"/>
+            </svg>
+            Ver en Vimeo
+          </a>
+          <button class="btn-secondary" onclick="copyToClipboard('${data.vimeoLink}')" style="display: inline-flex; align-items: center; gap: 8px;">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/>
+            </svg>
+            Copiar enlace
+          </button>
+        </div>
+      </div>
+    `;
+  } else if (vimeoStatus === 'uploading') {
+    // Subiendo en este momento
+    html += `
+      <div class="vimeo-action">
+        <h4>⏳ Subiendo a Vimeo...</h4>
+        <p>Por favor espera mientras se completa la subida.</p>
+        <div style="text-align: center; margin-top: 12px;">
+          <div class="spinner" style="border-color: #0ea5e9; border-top-color: transparent;"></div>
+        </div>
+      </div>
+    `;
+  } else {
+    // Mostrar botón (habilitado o deshabilitado según el score)
+    const threshold = data.scoreThreshold || 80;
+    
+    if (qualifiesForVimeo) {
+      // Botón habilitado
+      html += `
+        <div class="vimeo-action">
+          <h4>🎉 ¡Video aprobado para Vimeo!</h4>
+          <p>Tu video cumple con los estándares de calidad (≥${threshold}%). Puedes subirlo a Vimeo cuando estés listo.</p>
+          <button class="btn-vimeo" onclick="uploadToVimeo('${analysisId}')">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M23.977 6.416c-.105 2.338-1.739 5.543-4.894 9.609-3.268 4.247-6.026 6.37-8.29 6.37-1.409 0-2.578-1.294-3.553-3.881L5.322 11.4C4.603 8.816 3.834 7.522 3.01 7.522c-.179 0-.806.378-1.881 1.132L0 7.197a315.065 315.065 0 0 0 3.501-3.128C5.08 2.701 6.266 1.984 7.055 1.91c1.867-.18 3.016 1.1 3.447 3.838.465 2.953.789 4.789.971 5.507.537 2.45 1.131 3.674 1.776 3.674.502 0 1.256-.796 2.265-2.385 1.004-1.589 1.54-2.797 1.612-3.628.144-1.371-.395-2.061-1.614-2.061-.574 0-1.167.121-1.777.391 1.186-3.868 3.434-5.757 6.762-5.637 2.473.06 3.628 1.664 3.493 4.797l-.013.01z"/>
+            </svg>
+            Subir a Vimeo
+          </button>
+        </div>
+      `;
+    } else {
+      // Botón deshabilitado
+      const pointsNeeded = (threshold - score).toFixed(1);
+      html += `
+        <div class="vimeo-action" style="background: #fef2f2; border-color: #fca5a5;">
+          <h4>⚠️ Video no califica para Vimeo</h4>
+          <p>Tu video obtuvo <strong>${score.toFixed(1)}%</strong>, necesitas al menos <strong>${threshold}%</strong> para poder subirlo a Vimeo.</p>
+          <p style="font-size: 14px; color: #991b1b; margin-top: 8px;">
+            <strong>Te faltan ${pointsNeeded} puntos.</strong> Revisa las sugerencias abajo para mejorar tu video.
+          </p>
+          <button class="btn-vimeo" disabled style="opacity: 0.5; cursor: not-allowed;" 
+                  data-tooltip="Mejora tu video para alcanzar el ${threshold}% requerido">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M23.977 6.416c-.105 2.338-1.739 5.543-4.894 9.609-3.268 4.247-6.026 6.37-8.29 6.37-1.409 0-2.578-1.294-3.553-3.881L5.322 11.4C4.603 8.816 3.834 7.522 3.01 7.522c-.179 0-.806.378-1.881 1.132L0 7.197a315.065 315.065 0 0 0 3.501-3.128C5.08 2.701 6.266 1.984 7.055 1.91c1.867-.18 3.016 1.1 3.447 3.838.465 2.953.789 4.789.971 5.507.537 2.45 1.131 3.674 1.776 3.674.502 0 1.256-.796 2.265-2.385 1.004-1.589 1.54-2.797 1.612-3.628.144-1.371-.395-2.061-1.614-2.061-.574 0-1.167.121-1.777.391 1.186-3.868 3.434-5.757 6.762-5.637 2.473.06 3.628 1.664 3.493 4.797l-.013.01z"/>
+            </svg>
+            Subir a Vimeo (No disponible)
+          </button>
+        </div>
+      `;
+    }
+  }
+
+  // Sugerencias principales
+  if (result.suggestions && result.suggestions.length > 0) {
+    html += `
+      <div class="suggestions-section">
+        <h4>💡 Recomendaciones Principales</h4>
+        <ul>
+          ${result.suggestions.slice(0, 5).map(s => `<li>${s}</li>`).join('')}
+        </ul>
+      </div>
+    `;
+  }
+
+  // Findings (reglas evaluadas)
+  if (result.findings && result.findings.length > 0) {
+    html += `<h4 style="margin: 24px 0 16px 0;">📊 Evaluación Detallada</h4>`;
+    html += `<div class="findings-grid">`;
+    
+    result.findings.forEach(finding => {
+      const statusClass = finding.ok ? 'ok' : (finding.subScore >= 50 ? 'warning' : 'error');
+      const statusIcon = finding.ok ? '✅' : (finding.subScore >= 50 ? '⚠️' : '❌');
+      
+      html += `
+        <div class="finding-card ${statusClass}">
+          <div class="finding-title">
+            ${statusIcon} ${finding.ruleId.replace(/_/g, ' ')}
+          </div>
+          <div class="finding-score">${finding.subScore}%</div>
+          <div class="finding-note">${finding.note}</div>
+        </div>
+      `;
+    });
+    
+    html += `</div>`;
+  }
+
+  box.innerHTML = html;
+  show(box);
+}
+
+function renderAnalysisError(error) {
+  const box = $('#videoAnalysisResult');
+  if (!box) return;
+  
+  box.innerHTML = `
+    <div class="result-card error">
+      <h4>⚠️ Error en el análisis</h4>
+      <p style="color: #dc2626; margin-top: 12px;">${error || 'Error desconocido'}</p>
+      <button class="btn-secondary" onclick="cancelVideoPreview()" style="margin-top: 16px;">
+        Intentar de nuevo
+      </button>
+    </div>
+  `;
+  show(box);
+}
+
+/* ==========
+   Subir a Vimeo
+   ========== */
+window.uploadToVimeo = async function uploadToVimeo(analysisId) {
+  try {
+    if (!selectedFile) {
+      alert('El archivo de video ya no está disponible. Por favor, inicia el análisis nuevamente.');
+      return;
+    }
+
+    const btn = event.target;
+    btn.disabled = true;
+    btn.innerHTML = '<div class="spinner"></div> Subiendo...';
+    btn.classList.add('uploading');
+
+    const form = new FormData();
+    form.append('file', selectedFile);
+    form.append('analysisId', analysisId);
+
+    const res = await fetch(`${window.API_BASE}/uploadToVimeo`, {
+      method: 'POST',
+      body: form
+    });
+
+    const data = await res.json();
+
+    if (!res.ok) {
+      throw new Error(data.error || 'Error al subir a Vimeo');
+    }
+
+    console.log('Video subido a Vimeo:', data.vimeoLink);
+    
+    // Actualizar la UI directamente, sin depender solo del listener de Firestore
+    if (data.vimeoLink) {
+      // Actualizar el botón que se presionó
+      btn.disabled = false;
+      btn.classList.remove('uploading');
+      btn.innerHTML = `
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
+        </svg>
+        Ver en Vimeo
+      `;
+      btn.onclick = (e) => {
+        e.preventDefault();
+        window.open(data.vimeoLink, '_blank');
+      };
+      
+      // Actualizar la sección de Vimeo en los resultados
+      const vimeoSection = document.querySelector('.vimeo-action');
+      if (vimeoSection) {
+        vimeoSection.classList.add('success');
+        vimeoSection.innerHTML = `
+          <h4>✅ Video subido a Vimeo</h4>
+          <p>Tu video ha sido publicado exitosamente en Vimeo.</p>
+          <a href="${data.vimeoLink}" target="_blank" class="vimeo-link">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M23.977 6.416c-.105 2.338-1.739 5.543-4.894 9.609-3.268 4.247-6.026 6.37-8.29 6.37-1.409 0-2.578-1.294-3.553-3.881L5.322 11.4C4.603 8.816 3.834 7.522 3.01 7.522c-.179 0-.806.378-1.881 1.132L0 7.197a315.065 315.065 0 0 0 3.501-3.128C5.08 2.701 6.266 1.984 7.055 1.91c1.867-.18 3.016 1.1 3.447 3.838.465 2.953.789 4.789.971 5.507.537 2.45 1.131 3.674 1.776 3.674.502 0 1.256-.796 2.265-2.385 1.004-1.589 1.54-2.797 1.612-3.628.144-1.371-.395-2.061-1.614-2.061-.574 0-1.167.121-1.777.391 1.186-3.868 3.434-5.757 6.762-5.637 2.473.06 3.628 1.664 3.493 4.797l-.013.01z"/>
+            </svg>
+            Ver en Vimeo
+          </a>
+        `;
+      }
+      
+      // Actualizar también el botón del header
+      const headerBtn = $('#btnVimeoHeader');
+      if (headerBtn) {
+        headerBtn.disabled = false;
+        headerBtn.classList.remove('uploading');
+        headerBtn.style.background = 'linear-gradient(135deg, #22c55e 0%, #16a34a 100%)';
+        headerBtn.innerHTML = `
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
+          </svg>
+          Ver en Vimeo
+        `;
+        headerBtn.onclick = () => window.open(data.vimeoLink, '_blank');
+      }
+    }
+
+  } catch (err) {
+    console.error(err);
+    alert(err.message || 'Ocurrió un error al subir el video a Vimeo.');
+    
+    // Restaurar botón
+    const btn = event.target;
+    btn.disabled = false;
+    btn.innerHTML = `
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+        <path d="M23.977 6.416c-.105 2.338-1.739 5.543-4.894 9.609-3.268 4.247-6.026 6.37-8.29 6.37-1.409 0-2.578-1.294-3.553-3.881L5.322 11.4C4.603 8.816 3.834 7.522 3.01 7.522c-.179 0-.806.378-1.881 1.132L0 7.197a315.065 315.065 0 0 0 3.501-3.128C5.08 2.701 6.266 1.984 7.055 1.91c1.867-.18 3.016 1.1 3.447 3.838.465 2.953.789 4.789.971 5.507.537 2.45 1.131 3.674 1.776 3.674.502 0 1.256-.796 2.265-2.385 1.004-1.589 1.54-2.797 1.612-3.628.144-1.371-.395-2.061-1.614-2.061-.574 0-1.167.121-1.777.391 1.186-3.868 3.434-5.757 6.762-5.637 2.473.06 3.628 1.664 3.493 4.797l-.013.01z"/>
+      </svg>
+      Subir a Vimeo
+    `;
+    btn.classList.remove('uploading');
+  }
+};
+
+/* ==========
+   Botón de Vimeo en el Header
+   ========== */
+function updateVimeoHeaderButton(analysisId, qualifies, vimeoStatus, score, threshold, vimeoLink) {
+  console.log('🔵 updateVimeoHeaderButton llamada:', { analysisId, qualifies, vimeoStatus, score, threshold, vimeoLink });
+  
+  const btn = $('#btnVimeoHeader');
+  if (!btn) {
+    console.error('❌ Botón btnVimeoHeader no encontrado');
+    return;
+  }
+
+  console.log('✅ Botón encontrado, actualizando...');
+
+  if (vimeoStatus === 'uploaded' && vimeoLink) {
+    // Ya subido - mostrar link
+    btn.style.display = 'inline-flex';
+    btn.disabled = false;
+    btn.classList.remove('uploading');
+    btn.style.background = 'linear-gradient(135deg, #22c55e 0%, #16a34a 100%)';
+    btn.innerHTML = `
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+        <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
+      </svg>
+      Ver en Vimeo
+    `;
+    btn.onclick = () => window.open(vimeoLink, '_blank');
+  } else if (vimeoStatus === 'uploading') {
+    // Subiendo
+    btn.style.display = 'inline-flex';
+    btn.disabled = true;
+    btn.classList.add('uploading');
+    btn.innerHTML = '<div class="spinner"></div> Subiendo...';
+  } else if (qualifies) {
+    // Califica - botón habilitado
+    btn.style.display = 'inline-flex';
+    btn.disabled = false;
+    btn.classList.remove('uploading');
+    btn.style.background = 'linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%)';
+    btn.innerHTML = `
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+        <path d="M23.977 6.416c-.105 2.338-1.739 5.543-4.894 9.609-3.268 4.247-6.026 6.37-8.29 6.37-1.409 0-2.578-1.294-3.553-3.881L5.322 11.4C4.603 8.816 3.834 7.522 3.01 7.522c-.179 0-.806.378-1.881 1.132L0 7.197a315.065 315.065 0 0 0 3.501-3.128C5.08 2.701 6.266 1.984 7.055 1.91c1.867-.18 3.016 1.1 3.447 3.838.465 2.953.789 4.789.971 5.507.537 2.45 1.131 3.674 1.776 3.674.502 0 1.256-.796 2.265-2.385 1.004-1.589 1.54-2.797 1.612-3.628.144-1.371-.395-2.061-1.614-2.061-.574 0-1.167.121-1.777.391 1.186-3.868 3.434-5.757 6.762-5.637 2.473.06 3.628 1.664 3.493 4.797l-.013.01z"/>
+      </svg>
+      Subir a Vimeo
+    `;
+    btn.onclick = () => window.uploadToVimeoFromHeader();
+  } else {
+    // No califica - botón deshabilitado
+    btn.style.display = 'inline-flex';
+    btn.disabled = true;
+    btn.style.background = '#94a3b8';
+    btn.style.opacity = '0.6';
+    btn.title = `Necesitas ${threshold}% (tienes ${score.toFixed(1)}%)`;
+    btn.innerHTML = `
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/>
+      </svg>
+      No califica (${score.toFixed(1)}%)
+    `;
+  }
+}
+
+window.uploadToVimeoFromHeader = async function uploadToVimeoFromHeader() {
+  if (!currentAnalysisId) {
+    alert('No hay análisis activo');
+    return;
+  }
+  await window.uploadToVimeo(currentAnalysisId);
+};
+</script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script type="module" src="js/dashboard-init.js"></script>
     <script type="module" src="js/apps-manager.js"></script>
 </body>
