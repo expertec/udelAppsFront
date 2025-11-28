@@ -1,122 +1,121 @@
-// login.js
+// login.js — Email/Password con aprobación (misma lógica que tu Google Sign-In)
+// Mantiene Firebase 10.7.1 para ser consistente con el dashboard.
+
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
-import { 
-    getAuth, 
-    signInWithPopup,
-    GoogleAuthProvider,
-    onAuthStateChanged 
+import {
+  getAuth,
+  onAuthStateChanged,
+  signInWithEmailAndPassword,
+  sendPasswordResetEmail,
+  signOut,
 } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
-import { 
-    getFirestore, 
-    doc, 
-    setDoc, 
-    getDoc 
+import {
+  getFirestore,
+  doc,
+  getDoc,
 } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
 
 import { firebaseConfig } from './firebase-config.js';
 
-// Inicializar Firebase
+// Inicializar Firebase (igual que antes)
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
-const googleProvider = new GoogleAuthProvider();
 
-// Elementos del DOM
-const messageDiv = document.getElementById('message');
-const googleLoginBtn = document.getElementById('googleLoginBtn');
+// Elementos del DOM (IDs nuevos que pusimos en index.html)
+const messageDiv  = document.getElementById('message');
+const emailInput  = document.getElementById('email');
+const passInput   = document.getElementById('password');
+const btnLogin    = document.getElementById('btnLogin');
+const btnReset    = document.getElementById('btnReset');
 
-// Login con Google
-async function signInWithGoogle() {
-    try {
-        const result = await signInWithPopup(auth, googleProvider);
-        const user = result.user;
-
-        // Verificar si el usuario ya existe en Firestore
-        const userDocRef = doc(db, 'users', user.uid);
-        const userDoc = await getDoc(userDocRef);
-
-        if (!userDoc.exists()) {
-            // Es un nuevo usuario, crear su documento
-            await setDoc(userDocRef, {
-                name: user.displayName || 'Usuario de Google',
-                email: user.email,
-                photoURL: user.photoURL || null,
-                role: 'user',
-                approved: false,
-                createdAt: new Date().toISOString()
-            });
-
-            showMessage('¡Cuenta creada! Tu cuenta está pendiente de aprobación.', 'success');
-            await auth.signOut();
-            return;
-        }
-
-        // Usuario existente, verificar si está aprobado
-        const userData = userDoc.data();
-        if (userData.approved) {
-            showMessage('¡Inicio de sesión exitoso!', 'success');
-            setTimeout(() => {
-                window.location.href = 'dashboard.html';
-            }, 1000);
-        } else {
-            showMessage('Tu cuenta está pendiente de aprobación por un administrador.', 'warning');
-            await auth.signOut();
-        }
-    } catch (error) {
-        console.error('Error con Google Sign-In:', error);
-        if (error.code === 'auth/popup-closed-by-user') {
-            showMessage('Inicio de sesión cancelado.', 'error');
-        } else if (error.code === 'auth/popup-blocked') {
-            showMessage('Popup bloqueado. Permite popups para este sitio.', 'error');
-        } else {
-            showMessage('Error: ' + getErrorMessage(error.code), 'error');
-        }
-    }
+// Utilidades UI (mismo estilo de mensajes que ya usabas)
+function showMessage(message, type) {
+  if (!messageDiv) return;
+  messageDiv.textContent = message;
+  messageDiv.className = 'message ' + type;
+  messageDiv.style.display = 'block';
+  setTimeout(() => { messageDiv.style.display = 'none'; }, 5000);
 }
+function getErrorMessage(code) {
+  const M = {
+    'auth/email-already-in-use': 'Este correo ya está registrado.',
+    'auth/invalid-email': 'Correo electrónico inválido.',
+    'auth/operation-not-allowed': 'Operación no permitida.',
+    'auth/weak-password': 'La contraseña debe tener al menos 6 caracteres.',
+    'auth/user-disabled': 'Esta cuenta ha sido deshabilitada.',
+    'auth/user-not-found': 'No existe una cuenta con este correo.',
+    'auth/wrong-password': 'Contraseña incorrecta.',
+    'auth/invalid-credential': 'Credenciales inválidas.',
+    'auth/too-many-requests': 'Demasiados intentos. Intenta más tarde.'
+  };
+  return M[code] || 'Ha ocurrido un error. Intenta nuevamente.';
+}
+const isValidEmail = (v) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);
 
-// Event listener para botón de Google
-googleLoginBtn.addEventListener('click', signInWithGoogle);
+// ===== Login =====
+// Igual que antes: si approved -> dashboard, si no -> mensaje y signOut
+btnLogin?.addEventListener('click', async () => {
+  try {
+    const email = (emailInput?.value || '').trim();
+    const pass  = (passInput?.value  || '').trim();
 
-// Verificar estado de autenticación
-onAuthStateChanged(auth, async (user) => {
-    if (user) {
-        // Usuario autenticado, verificar su rol y estado
-        const userDoc = await getDoc(doc(db, 'users', user.uid));
-        if (userDoc.exists()) {
-            const userData = userDoc.data();
-            
-            if (userData.approved) {
-                // Redirigir al dashboard
-                window.location.href = 'dashboard.html';
-            } else {
-                showMessage('Tu cuenta está pendiente de aprobación por un administrador.', 'warning');
-                await auth.signOut();
-            }
-        }
+    if (!email || !pass) return showMessage('Completa email y contraseña.', 'error');
+
+    const cred = await signInWithEmailAndPassword(auth, email, pass);
+    const user = cred.user;
+
+    const userDoc = await getDoc(doc(db, 'users', user.uid));
+    if (!userDoc.exists()) {
+      showMessage('Tu registro está incompleto. Contacta al administrador.', 'warning');
+      await signOut(auth);
+      return;
     }
+
+    const data = userDoc.data();
+    if (data.approved) {
+      showMessage('¡Inicio de sesión exitoso!', 'success');
+      setTimeout(() => { window.location.href = 'dashboard.html'; }, 800);
+    } else {
+      showMessage('Tu cuenta está pendiente de aprobación por un administrador.', 'warning');
+      await signOut(auth);
+    }
+  } catch (e) {
+    console.error('Error en login:', e);
+    showMessage(getErrorMessage(e.code), 'error');
+  }
 });
 
-// Funciones auxiliares
-function showMessage(message, type) {
-    messageDiv.textContent = message;
-    messageDiv.className = 'message ' + type;
-    messageDiv.style.display = 'block';
-    
-    setTimeout(() => {
-        messageDiv.style.display = 'none';
-    }, 5000);
-}
+// ===== Reset de contraseña =====
+btnReset?.addEventListener('click', async () => {
+  try {
+    const email = (emailInput?.value || '').trim();
+    if (!email) return showMessage('Escribe tu correo para enviarte el enlace.', 'error');
+    if (!isValidEmail(email)) return showMessage('Escribe un correo válido.', 'error');
 
-function getErrorMessage(errorCode) {
-    const errorMessages = {
-        'auth/email-already-in-use': 'Este correo ya está registrado.',
-        'auth/invalid-email': 'Correo electrónico inválido.',
-        'auth/operation-not-allowed': 'Operación no permitida.',
-        'auth/weak-password': 'La contraseña debe tener al menos 6 caracteres.',
-        'auth/user-disabled': 'Esta cuenta ha sido deshabilitada.',
-        'auth/user-not-found': 'No existe una cuenta con este correo.',
-        'auth/wrong-password': 'Contraseña incorrecta.',
-        'auth/invalid-credential': 'Credenciales inválidas.'
-    };
-    return errorMessages[errorCode] || 'Ha ocurrido un error. Intenta nuevamente.';
-}
+    await sendPasswordResetEmail(auth, email);
+    showMessage('Te enviamos un enlace para restablecer tu contraseña.', 'success');
+  } catch (e) {
+    console.error('Error en reset:', e);
+    showMessage(getErrorMessage(e.code), 'error');
+  }
+});
+
+// ===== Estado de auth (igual que antes) =====
+onAuthStateChanged(auth, async (user) => {
+  if (!user) return;
+  try {
+    const snap = await getDoc(doc(db, 'users', user.uid));
+    if (snap.exists()) {
+      const data = snap.data();
+      if (data.approved) {
+        window.location.href = 'dashboard.html';
+      } else {
+        showMessage('Tu cuenta está pendiente de aprobación por un administrador.', 'warning');
+        await signOut(auth);
+      }
+    }
+  } catch (e) {
+    console.error('onAuthStateChanged error:', e);
+  }
+});

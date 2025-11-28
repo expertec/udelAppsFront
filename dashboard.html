@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="css/dashboard.css">
     <link rel="stylesheet" href="css/apps.css">
     <link rel="stylesheet" href="css/modals.css">
+    <link rel="stylesheet" href="css/admin-dashboard.css">
     <link rel="stylesheet" href="css/responsive.css">
     <style>
         /* Estilos adicionales para resultados del análisis */
@@ -240,123 +241,14 @@
     </nav>
 
     <div class="container">
-        <div class="welcome-card">
-            <h2 id="welcomeTitle">Cargando...</h2>
-            <p id="welcomeDescription"></p>
-        </div>
-
         <div id="message" class="message"></div>
 
-        <!-- Vista de Usuario Normal -->
+        <!-- Vista Unificada para Todos los Roles -->
         <div id="userView" class="hidden">
             <div class="apps-desktop">
                 <div class="apps-grid" id="appsGrid">
                     <!-- Las aplicaciones se cargarán dinámicamente según el rol del usuario -->
                 </div>
-            </div>
-        </div>
-
-        <!-- Vista de Admin -->
-        <div id="adminView" class="hidden">
-            <!-- Panel de Creación de Usuarios (solo superAdmin) -->
-            <div id="userCreationPanel" class="section hidden">
-                <div class="section-header">
-                    <h3>➕ Crear Nuevo Usuario</h3>
-                </div>
-                <div style="background: white; padding: 24px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
-                    <form id="createUserForm">
-                        <div class="form-group">
-                            <label for="userEmail">Correo Electrónico *</label>
-                            <input type="email" id="userEmail" required placeholder="usuario@universidad.mx">
-                        </div>
-
-                        <div class="form-group">
-                            <label for="userPassword">Contraseña *</label>
-                            <input type="password" id="userPassword" required placeholder="Mínimo 6 caracteres" minlength="6">
-                        </div>
-
-                        <div class="form-group">
-                            <label for="newUserRole">Rol *</label>
-                            <select id="newUserRole" required onchange="toggleUserFields()">
-                                <option value="">Selecciona un rol</option>
-                                <option value="superAdmin">Super Administrador</option>
-                                <option value="director">Director</option>
-                                <option value="mentor">Mentor</option>
-                            </select>
-                        </div>
-
-                        <div id="additionalFields" class="hidden">
-                            <div class="form-group">
-                                <label for="newUserName">Nombre *</label>
-                                <input type="text" id="newUserName" placeholder="Ej: Juan">
-                            </div>
-
-                            <div class="form-group">
-                                <label for="newUserLastName">Apellido *</label>
-                                <input type="text" id="newUserLastName" placeholder="Ej: Pérez">
-                            </div>
-
-                            <div class="form-group">
-                                <label for="newUserPlantel">Plantel *</label>
-                                <select id="newUserPlantel">
-                                    <option value="">Selecciona un plantel</option>
-                                    <!-- Planteles se cargarán dinámicamente -->
-                                </select>
-                            </div>
-
-                            <div class="form-group">
-                                <label for="newUserCiudad">Ciudad *</label>
-                                <input type="text" id="newUserCiudad" placeholder="Ej: Guadalajara">
-                            </div>
-
-                            <div class="form-group">
-                                <label for="newUserWhatsapp">WhatsApp *</label>
-                                <input type="tel" id="newUserWhatsapp" placeholder="Ej: +52 33 1234 5678">
-                            </div>
-                        </div>
-
-                        <div style="display: flex; gap: 12px; margin-top: 24px;">
-                            <button type="submit" class="btn-primary" style="flex: 1;">Crear Usuario</button>
-                            <button type="button" class="btn-secondary" onclick="resetUserForm()">Limpiar</button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-
-            <!-- Gestión de Planteles (solo superAdmin) -->
-            <div id="plantelesPanel" class="section hidden">
-                <div class="section-header">
-                    <h3>🏫 Gestionar Planteles</h3>
-                    <button class="btn-primary" onclick="openPlantelModal()">➕ Nuevo Plantel</button>
-                </div>
-                <div id="plantelesContainer" style="background: white; padding: 24px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
-                    <!-- Los planteles se cargarán dinámicamente aquí -->
-                </div>
-            </div>
-
-            <!-- Gestión de Usuarios Pendientes -->
-            <div class="section">
-                <div class="section-header">
-                    <h3>👥 Usuarios Pendientes de Aprobación</h3>
-                </div>
-                <div id="pendingUsersContainer"></div>
-            </div>
-
-            <!-- Gestión de Todos los Usuarios -->
-            <div class="section">
-                <div class="section-header">
-                    <h3>👥 Todos los Usuarios</h3>
-                </div>
-                <div id="allUsersContainer"></div>
-            </div>
-
-            <!-- Gestión de Items -->
-            <div class="section">
-                <div class="section-header">
-                    <h3>📝 Todos los Items</h3>
-                    <button class="btn-primary" onclick="openItemModal()">➕ Nuevo Item</button>
-                </div>
-                <div id="allItemsContainer"></div>
             </div>
         </div>
     </div>
@@ -544,6 +436,364 @@
         </div>
     </div>
 
+    <!-- Modal: Mis Solicitudes (Lista y Detalles) -->
+    <div id="misSolicitudesModal" class="app-modal">
+        <div class="app-modal-content" style="max-width: 1100px;">
+            <div class="app-modal-header">
+                <div style="display: flex; align-items: center; gap: 12px; flex: 1;">
+                    <button id="btnVolverLista" class="hidden" onclick="volverAListaSolicitudes()" style="background: none; border: none; color: #742f34; cursor: pointer; padding: 4px 8px; display: flex; align-items: center; gap: 4px; font-size: 14px; font-weight: 600;">
+                        <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+                        </svg>
+                        Volver
+                    </button>
+                    <h3 class="app-modal-title" id="modalSolicitudesTitle">📋 Mis Solicitudes de Certificados</h3>
+                </div>
+                <button class="app-modal-close" onclick="closeMisSolicitudesModal()">×</button>
+            </div>
+            <div class="app-modal-body">
+                <!-- Vista de Lista -->
+                <div id="vistaListaSolicitudes">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                        <p style="color: #6b7280; margin: 0;">Aquí puedes ver todas tus solicitudes y su estatus actual</p>
+                        <a href="solicitud-certificado/index.html" class="btn-primary" style="text-decoration: none; display: inline-block;">
+                            Nueva Solicitud
+                        </a>
+                    </div>
+                    <div id="misSolicitudesContainer">
+                        <!-- Las solicitudes se cargarán aquí -->
+                    </div>
+                </div>
+
+                <!-- Vista de Detalles -->
+                <div id="vistaDetalleSolicitud" class="hidden">
+                    <div id="solicitudDetalleContent">
+                        <!-- El contenido se cargará dinámicamente -->
+                    </div>
+
+                    <!-- Sección de Comentarios -->
+                    <div style="margin-top: 32px; padding-top: 32px; border-top: 2px solid #e5e7eb;">
+                        <h4 style="margin-bottom: 16px; color: #1f2937;">💬 Comentarios y Seguimiento</h4>
+
+                        <!-- Formulario para agregar comentario -->
+                        <div style="background: #f9fafb; padding: 16px; border-radius: 8px; margin-bottom: 20px;">
+                            <textarea
+                                id="nuevoComentario"
+                                placeholder="Escribe un comentario o pregunta sobre tu solicitud..."
+                                style="width: 100%; min-height: 80px; padding: 12px; border: 1px solid #e5e7eb; border-radius: 6px; font-family: inherit; resize: vertical;"
+                            ></textarea>
+                            <button class="btn-primary" onclick="agregarComentario()" style="margin-top: 12px;">
+                                Agregar Comentario
+                            </button>
+                        </div>
+
+                        <!-- Lista de comentarios -->
+                        <div id="listaComentarios" style="display: grid; gap: 12px;">
+                            <!-- Los comentarios se cargarán aquí -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal: Detalles de Solicitud (para Admin/Director) -->
+    <div id="detallesSolicitudModal" class="app-modal">
+        <div class="app-modal-content" style="max-width: 1000px;">
+            <div class="app-modal-header">
+                <h3 class="app-modal-title">📋 Detalles de la Solicitud</h3>
+                <button class="app-modal-close" onclick="closeDetallesSolicitudModal()">×</button>
+            </div>
+            <div class="app-modal-body">
+                <div id="detallesSolicitudContent">
+                    <!-- El contenido se cargará dinámicamente -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal: Gestión de Usuarios (Admin) -->
+    <div id="gestionUsuariosModal" class="app-modal">
+        <div class="app-modal-content" style="max-width: 1200px;">
+            <div class="app-modal-header">
+                <div style="display: flex; align-items: center; gap: 12px; flex: 1;">
+                    <button id="btnVolverListaUsuarios" class="hidden" onclick="volverAListaUsuarios()" style="background: none; border: none; color: #742f34; cursor: pointer; padding: 4px 8px; display: flex; align-items: center; gap: 4px; font-size: 14px; font-weight: 600;">
+                        <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+                        </svg>
+                        Volver
+                    </button>
+                    <h3 class="app-modal-title" id="tituloGestionUsuarios">👥 Gestión de Usuarios</h3>
+                </div>
+                <button class="app-modal-close" onclick="closeGestionUsuariosModal()">×</button>
+            </div>
+            <div class="app-modal-body">
+                <!-- Vista de Lista de Usuarios -->
+                <div id="vistaListaUsuarios">
+                    <!-- Header con botón para agregar usuario -->
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                        <p class="section-subtitle" style="margin: 0;">Administra todos los usuarios del sistema</p>
+                        <button class="btn-primary" onclick="mostrarFormularioUsuario('crear')" style="display: flex; align-items: center; gap: 8px;">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <line x1="12" y1="5" x2="12" y2="19"></line>
+                                <line x1="5" y1="12" x2="19" y2="12"></line>
+                            </svg>
+                            Nuevo Usuario
+                        </button>
+                    </div>
+
+                    <!-- Tabla de Usuarios -->
+                    <div style="overflow-x: auto; border: 1px solid #e5e7eb; border-radius: 8px;">
+                        <table id="usersTable" style="width: 100%; border-collapse: collapse; background: white;">
+                            <thead style="background: #f9fafb; border-bottom: 2px solid #e5e7eb;">
+                                <tr>
+                                    <th style="padding: 12px; text-align: left; font-weight: 600; color: #374151; font-size: 14px;">Usuario</th>
+                                    <th style="padding: 12px; text-align: left; font-weight: 600; color: #374151; font-size: 14px;">Email</th>
+                                    <th style="padding: 12px; text-align: left; font-weight: 600; color: #374151; font-size: 14px;">Rol</th>
+                                    <th style="padding: 12px; text-align: left; font-weight: 600; color: #374151; font-size: 14px;">Estado</th>
+                                    <th style="padding: 12px; text-align: center; font-weight: 600; color: #374151; font-size: 14px;">Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody id="usersTableBody">
+                                <!-- Las filas se cargarán dinámicamente -->
+                            </tbody>
+                        </table>
+                    </div>
+                    <div id="usersTableEmpty" class="hidden" style="text-align: center; padding: 40px; color: #6b7280;">
+                        <p>No hay usuarios registrados</p>
+                    </div>
+                </div>
+
+                <!-- Vista de Formulario de Usuario -->
+                <div id="vistaFormularioUsuario" class="hidden">
+                    <form id="userForm" onsubmit="saveUserData(event)">
+                        <input type="hidden" id="editUserId" value="">
+
+                        <!-- Datos Básicos -->
+                        <div class="form-group">
+                            <label for="userFormEmail">Correo Electrónico *</label>
+                            <input type="email" id="userFormEmail" required placeholder="usuario@universidad.mx">
+                        </div>
+
+                        <div class="form-group" id="passwordField">
+                            <label for="userFormPassword">Contraseña *</label>
+                            <input type="password" id="userFormPassword" placeholder="Mínimo 6 caracteres" minlength="6">
+                            <p style="font-size: 12px; color: #6b7280; margin-top: 4px;">Deja en blanco para mantener la contraseña actual al editar</p>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="userFormRole">Rol *</label>
+                            <select id="userFormRole" required onchange="toggleUserFormFields()">
+                                <option value="">Selecciona un rol</option>
+                                <option value="superAdmin">Super Administrador</option>
+                                <option value="director">Director</option>
+                                <option value="mentor">Mentor</option>
+                            </select>
+                        </div>
+
+                        <!-- Campos Adicionales (Director/Mentor) -->
+                        <div id="userFormAdditionalFields" class="hidden">
+                            <div class="form-group">
+                                <label for="userFormName">Nombre *</label>
+                                <input type="text" id="userFormName" placeholder="Ej: Juan">
+                            </div>
+
+                            <div class="form-group">
+                                <label for="userFormLastName">Apellido *</label>
+                                <input type="text" id="userFormLastName" placeholder="Ej: Pérez">
+                            </div>
+
+                            <div class="form-group">
+                                <label for="userFormPlantel">Plantel *</label>
+                                <select id="userFormPlantel">
+                                    <option value="">Selecciona un plantel</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="userFormCiudad">Ciudad *</label>
+                                <input type="text" id="userFormCiudad" placeholder="Ej: Guadalajara">
+                            </div>
+
+                            <div class="form-group">
+                                <label for="userFormWhatsapp">WhatsApp *</label>
+                                <input type="tel" id="userFormWhatsapp" placeholder="Ej: +52 33 1234 5678">
+                            </div>
+                        </div>
+
+                        <!-- Permisos -->
+                        <div class="form-group" style="margin-top: 24px;">
+                            <label style="display: flex; align-items: center; gap: 8px; font-weight: 600; color: #374151; margin-bottom: 12px;">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                                    <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                                </svg>
+                                Permisos de Acceso a Aplicaciones
+                            </label>
+                            <div style="background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 8px; padding: 16px; display: grid; gap: 12px;">
+                                <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; padding: 8px; border-radius: 6px; transition: background 0.2s;" onmouseover="this.style.background='#f3f4f6'" onmouseout="this.style.background='transparent'">
+                                    <input type="checkbox" id="userForm_perm_analizador_videos" checked style="width: 18px; height: 18px; cursor: pointer;">
+                                    <span style="font-size: 14px; color: #374151;">📹 Analizador de Videos</span>
+                                </label>
+                                <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; padding: 8px; border-radius: 6px; transition: background 0.2s;" onmouseover="this.style.background='#f3f4f6'" onmouseout="this.style.background='transparent'">
+                                    <input type="checkbox" id="userForm_perm_carta_descriptiva" checked style="width: 18px; height: 18px; cursor: pointer;">
+                                    <span style="font-size: 14px; color: #374151;">📄 Carta Descriptiva</span>
+                                </label>
+                                <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; padding: 8px; border-radius: 6px; transition: background 0.2s;" onmouseover="this.style.background='#f3f4f6'" onmouseout="this.style.background='transparent'">
+                                    <input type="checkbox" id="userForm_perm_buscador_materias" checked style="width: 18px; height: 18px; cursor: pointer;">
+                                    <span style="font-size: 14px; color: #374151;">🔍 Buscador de Materias</span>
+                                </label>
+                                <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; padding: 8px; border-radius: 6px; transition: background 0.2s;" onmouseover="this.style.background='#f3f4f6'" onmouseout="this.style.background='transparent'">
+                                    <input type="checkbox" id="userForm_perm_solicitudes_certificados" checked style="width: 18px; height: 18px; cursor: pointer;">
+                                    <span style="font-size: 14px; color: #374151;">📋 Solicitudes de Certificados</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <div style="display: flex; gap: 12px; margin-top: 24px;">
+                            <button type="submit" class="btn-primary" style="flex: 1;" id="userFormSubmitBtn">Guardar</button>
+                            <button type="button" class="btn-secondary" onclick="volverAListaUsuarios()">Cancelar</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal: Gestionar Planteles (Admin) -->
+    <div id="gestionPlantelesModal" class="app-modal">
+        <div class="app-modal-content" style="max-width: 900px;">
+            <div class="app-modal-header">
+                <h3 class="app-modal-title">🏢 Gestionar Planteles</h3>
+                <button class="app-modal-close" onclick="closeGestionPlantelesModal()">×</button>
+            </div>
+            <div class="app-modal-body">
+                <p class="section-subtitle" style="margin-bottom: 24px;">Administra los planteles disponibles en el sistema</p>
+
+                <div class="content-card">
+                    <div class="card-header">
+                        <h3 class="card-title">Lista de Planteles</h3>
+                        <button class="btn-primary" onclick="openPlantelModal()">➕ Nuevo Plantel</button>
+                    </div>
+                    <div id="plantelesContainer">
+                        <!-- Los planteles se cargarán dinámicamente aquí -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal: Solicitudes de Certificados (Unificado) -->
+    <div id="solicitudesCertificadosModal" class="app-modal">
+        <div class="app-modal-content" style="max-width: 1200px;">
+            <div class="app-modal-header">
+                <div style="display: flex; align-items: center; gap: 12px; flex: 1;">
+                    <button id="btnVolverListaCertificados" class="hidden" onclick="volverAListaCertificados()" style="background: none; border: none; color: #742f34; cursor: pointer; padding: 4px 8px; display: flex; align-items: center; gap: 4px; font-size: 14px; font-weight: 600;">
+                        <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+                        </svg>
+                        Volver
+                    </button>
+                    <h3 class="app-modal-title" id="tituloCertificados">📋 Solicitudes de Certificados</h3>
+                </div>
+                <button class="app-modal-close" onclick="closeSolicitudesCertificadosModal()">×</button>
+            </div>
+            <div class="app-modal-body">
+                <!-- Vista de Lista de Certificados -->
+                <div id="vistaListaCertificados">
+                    <!-- Header con filtros y botón de nueva solicitud -->
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 12px;">
+                        <div style="display: flex; align-items: center; gap: 12px;">
+                            <label for="filtroEstatusCertificados" style="font-weight: 500; color: #374151;">Filtrar:</label>
+                            <select id="filtroEstatusCertificados" onchange="filtrarSolicitudesCertificados()" style="padding: 8px 12px; border-radius: 6px; border: 1px solid #e5e7eb; background: white;">
+                                <option value="todas">Todas</option>
+                                <option value="pendiente">Pendientes</option>
+                                <option value="en_proceso">En proceso</option>
+                                <option value="aprobado">Aprobadas</option>
+                                <option value="rechazado">Rechazadas</option>
+                                <option value="completado">Completadas</option>
+                            </select>
+                        </div>
+                        <button class="btn-primary" id="btnNuevaSolicitud" onclick="mostrarFormularioCertificado()" style="display: flex; align-items: center; gap: 8px;">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <line x1="12" y1="5" x2="12" y2="19"></line>
+                                <line x1="5" y1="12" x2="19" y2="12"></line>
+                            </svg>
+                            Nueva Solicitud
+                        </button>
+                    </div>
+
+                    <!-- Tabla de Solicitudes -->
+                    <div style="overflow-x: auto; border: 1px solid #e5e7eb; border-radius: 8px;">
+                        <table id="certificadosTable" style="width: 100%; border-collapse: collapse; background: white;">
+                            <thead style="background: #f9fafb; border-bottom: 2px solid #e5e7eb;">
+                                <tr>
+                                    <th style="padding: 12px; text-align: left; font-weight: 600; color: #374151; font-size: 14px;">Solicitante</th>
+                                    <th style="padding: 12px; text-align: left; font-weight: 600; color: #374151; font-size: 14px;">Plantel</th>
+                                    <th style="padding: 12px; text-align: left; font-weight: 600; color: #374151; font-size: 14px;">Tipo</th>
+                                    <th style="padding: 12px; text-align: left; font-weight: 600; color: #374151; font-size: 14px;">Fecha</th>
+                                    <th style="padding: 12px; text-align: left; font-weight: 600; color: #374151; font-size: 14px;">Estado</th>
+                                    <th style="padding: 12px; text-align: center; font-weight: 600; color: #374151; font-size: 14px;">Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody id="certificadosTableBody">
+                                <!-- Las filas se cargarán dinámicamente -->
+                            </tbody>
+                        </table>
+                    </div>
+                    <div id="certificadosTableEmpty" class="hidden" style="text-align: center; padding: 40px; color: #6b7280;">
+                        <p>No hay solicitudes registradas</p>
+                    </div>
+                </div>
+
+                <!-- Vista de Formulario de Certificado -->
+                <div id="vistaFormularioCertificado" class="hidden">
+                    <p class="section-subtitle" style="margin-bottom: 24px;">Complete el formulario para solicitar su certificado</p>
+                    <form id="certificadoForm" onsubmit="guardarSolicitudCertificado(event)">
+                        <input type="hidden" id="editCertificadoId" value="">
+
+                        <div class="form-group">
+                            <label for="certNombres">Nombres completos *</label>
+                            <input type="text" id="certNombres" required placeholder="Ej: Juan Carlos">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="certApellidos">Apellidos completos *</label>
+                            <input type="text" id="certApellidos" required placeholder="Ej: García López">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="certPlantel">Plantel *</label>
+                            <select id="certPlantel" required>
+                                <option value="">Seleccione un plantel</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="certTipoCertificado">Tipo de Certificado *</label>
+                            <select id="certTipoCertificado" required>
+                                <option value="">Seleccione el tipo</option>
+                                <option value="estudios">Certificado de Estudios</option>
+                                <option value="parcial">Certificado Parcial</option>
+                                <option value="total">Certificado Total</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="certObservaciones">Observaciones</label>
+                            <textarea id="certObservaciones" rows="4" placeholder="Información adicional (opcional)"></textarea>
+                        </div>
+
+                        <div style="display: flex; gap: 12px; margin-top: 24px;">
+                            <button type="submit" class="btn-primary" style="flex: 1;">Enviar Solicitud</button>
+                            <button type="button" class="btn-secondary" onclick="volverAListaCertificados()">Cancelar</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
 <script>
   window.API_BASE = 'https://udelapps.onrender.com';
 
@@ -586,7 +836,7 @@
     document.getElementById('additionalFields').classList.add('hidden');
   };
 
-  // Funciones para modal de planteles
+  // Funciones para modal de planteles (pequeño modal de crear/editar)
   window.openPlantelModal = function() {
     document.getElementById('plantelModalTitle').textContent = 'Nuevo Plantel';
     document.getElementById('plantelForm').reset();
@@ -597,22 +847,193 @@
     document.getElementById('plantelModal').classList.remove('open');
     document.getElementById('plantelForm').reset();
   };
+
+  // Funciones para los modales administrativos
+  window.openGestionUsuariosModal = function() {
+    console.log('🔓 Abriendo modal de gestión de usuarios...');
+    console.log('window.db disponible:', !!window.db);
+    console.log('window.loadAllUsers disponible:', typeof window.loadAllUsers);
+
+    document.getElementById('gestionUsuariosModal').classList.add('open');
+
+    if (window.loadAllUsers) {
+      console.log('✅ Llamando a window.loadAllUsers()');
+      window.loadAllUsers();
+    } else {
+      console.error('❌ window.loadAllUsers no está disponible');
+    }
+  };
+
+  window.closeGestionUsuariosModal = function() {
+    document.getElementById('gestionUsuariosModal').classList.remove('open');
+  };
+
+  window.openGestionPlantelesModal = function() {
+    document.getElementById('gestionPlantelesModal').classList.add('open');
+    if (window.loadAllPlanteles) window.loadAllPlanteles();
+  };
+
+  window.closeGestionPlantelesModal = function() {
+    document.getElementById('gestionPlantelesModal').classList.remove('open');
+  };
+
+  window.openSolicitudesCertificadosModal = function() {
+    console.log('📋 Abriendo modal de solicitudes de certificados...');
+    document.getElementById('solicitudesCertificadosModal').classList.add('open');
+
+    // Cargar solicitudes según el rol del usuario
+    if (window.loadSolicitudesCertificados) {
+      window.loadSolicitudesCertificados();
+    }
+  };
+
+  window.closeSolicitudesCertificadosModal = function() {
+    document.getElementById('solicitudesCertificadosModal').classList.remove('open');
+    // Volver a la vista de lista al cerrar
+    if (document.getElementById('vistaFormularioCertificado').classList.contains('hidden') === false) {
+      volverAListaCertificados();
+    }
+  };
+
+  // Funciones para gestión de certificados en la misma modal
+  window.mostrarFormularioCertificado = async function() {
+    console.log('📝 Mostrando formulario de certificado');
+
+    // Ocultar lista, mostrar formulario
+    document.getElementById('vistaListaCertificados').classList.add('hidden');
+    document.getElementById('vistaFormularioCertificado').classList.remove('hidden');
+    document.getElementById('btnVolverListaCertificados').classList.remove('hidden');
+    document.getElementById('tituloCertificados').textContent = '📝 Nueva Solicitud de Certificado';
+
+    // Resetear formulario
+    document.getElementById('certificadoForm').reset();
+    document.getElementById('editCertificadoId').value = '';
+
+    // Cargar planteles
+    if (window.loadPlantelesForCertificado) {
+      await window.loadPlantelesForCertificado();
+    }
+  };
+
+  window.volverAListaCertificados = function() {
+    console.log('🔙 Volviendo a lista de certificados');
+
+    // Mostrar lista, ocultar formulario
+    document.getElementById('vistaListaCertificados').classList.remove('hidden');
+    document.getElementById('vistaFormularioCertificado').classList.add('hidden');
+    document.getElementById('btnVolverListaCertificados').classList.add('hidden');
+    document.getElementById('tituloCertificados').textContent = '📋 Solicitudes de Certificados';
+
+    // Limpiar formulario
+    document.getElementById('certificadoForm').reset();
+    document.getElementById('editCertificadoId').value = '';
+  };
+
+  // Modal de Permisos Dashboard eliminado - ahora los permisos se gestionan por usuario
+
+  // Funciones stub del modal de usuarios (serán reemplazadas por apps-manager.js)
+  window.openUserFormModal = function() {
+    console.warn('⚠️ apps-manager.js aún no ha cargado - openUserFormModal');
+  };
+
+  window.closeUserFormModal = function() {
+    console.warn('⚠️ apps-manager.js aún no ha cargado - closeUserFormModal');
+    document.getElementById('userFormModal').style.display = 'none';
+  };
+
+  window.saveUserData = function(event) {
+    event.preventDefault();
+    console.warn('⚠️ apps-manager.js aún no ha cargado - saveUserData');
+  };
+
+  window.toggleUserFormFields = function() {
+    // Implementación básica de respaldo
+    const role = document.getElementById('userFormRole')?.value;
+    const additionalFields = document.getElementById('userFormAdditionalFields');
+    if (role === 'director' || role === 'mentor') {
+      additionalFields?.classList.remove('hidden');
+    } else {
+      additionalFields?.classList.add('hidden');
+    }
+  };
+
+  window.openEditUserModal = function(userId) {
+    console.warn('⚠️ apps-manager.js aún no ha cargado - openEditUserModal');
+  };
+
+  window.deleteUser = function(userId) {
+    console.warn('⚠️ apps-manager.js aún no ha cargado - deleteUser');
+  };
+
+  window.approveUser = function(userId) {
+    console.warn('⚠️ apps-manager.js aún no ha cargado - approveUser');
+  };
+
+  // Funciones para gestión de usuarios en la misma modal
+  window.mostrarFormularioUsuario = async function(modo, userId = null) {
+    console.log('📝 Mostrando formulario de usuario, modo:', modo);
+
+    // Ocultar lista, mostrar formulario
+    document.getElementById('vistaListaUsuarios').classList.add('hidden');
+    document.getElementById('vistaFormularioUsuario').classList.remove('hidden');
+    document.getElementById('btnVolverListaUsuarios').classList.remove('hidden');
+
+    if (modo === 'crear') {
+      // Modo crear
+      document.getElementById('tituloGestionUsuarios').textContent = '➕ Crear Nuevo Usuario';
+      document.getElementById('userForm').reset();
+      document.getElementById('editUserId').value = '';
+      document.getElementById('userFormPassword').required = true;
+      document.getElementById('userFormSubmitBtn').textContent = 'Crear Usuario';
+
+      // Permisos por defecto
+      document.getElementById('userForm_perm_analizador_videos').checked = true;
+      document.getElementById('userForm_perm_carta_descriptiva').checked = true;
+      document.getElementById('userForm_perm_buscador_materias').checked = true;
+      document.getElementById('userForm_perm_solicitudes_certificados').checked = true;
+
+      // Cargar planteles
+      if (window.loadPlantelesForUserForm) {
+        await window.loadPlantelesForUserForm();
+      }
+
+    } else if (modo === 'editar' && userId) {
+      // Modo editar
+      document.getElementById('tituloGestionUsuarios').textContent = '✏️ Editar Usuario';
+      document.getElementById('userFormSubmitBtn').textContent = 'Guardar Cambios';
+
+      // Llamar a la función de edición si está disponible
+      if (window.openEditUserModalContent) {
+        await window.openEditUserModalContent(userId);
+      }
+    }
+  };
+
+  window.volverAListaUsuarios = function() {
+    console.log('🔙 Volviendo a lista de usuarios');
+
+    // Mostrar lista, ocultar formulario
+    document.getElementById('vistaListaUsuarios').classList.remove('hidden');
+    document.getElementById('vistaFormularioUsuario').classList.add('hidden');
+    document.getElementById('btnVolverListaUsuarios').classList.add('hidden');
+    document.getElementById('tituloGestionUsuarios').textContent = '👥 Gestión de Usuarios';
+
+    // Limpiar formulario
+    document.getElementById('userForm').reset();
+    document.getElementById('editUserId').value = '';
+  };
 </script>
 
 <script type="module">
-console.log('🚀 SCRIPT CARGADO - dashboard.html v2.0');
+console.log('🚀 SCRIPT INLINE CARGADO - dashboard.html');
 
-/* ==========
-   Imports Firebase
-   ========== */
-import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.13.1/firebase-app.js';
-import { getFirestore, doc, onSnapshot } from 'https://www.gstatic.com/firebasejs/10.13.1/firebase-firestore.js';
-import { firebaseConfig } from './js/firebase-config.js';
+/* NOTA: Este script ya NO inicializa Firebase.
+   Firebase se inicializa en dashboard-init.js y se expone como window.db
+   Este script solo contiene funciones específicas del analizador de video
+   que necesitan estar en el scope del HTML para los listeners de Firestore */
 
-// Inicializar Firebase
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
-window.db = db; // Exponer para otros scripts
+// Importar solo las funciones de Firestore necesarias (sin initializeApp)
+import { doc, onSnapshot } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
 
 /* ==========
    Estado local
@@ -825,8 +1246,16 @@ window.startVideoAnalysis = async function startVideoAnalysis() {
    ========== */
 function beginFirestoreListener(analysisId) {
   try {
-    const ref = doc(db, 'analyses', analysisId);
-    
+    // Usar window.db que fue inicializado en dashboard-init.js
+    const database = window.db;
+
+    if (!database) {
+      console.error('❌ window.db no está disponible para el listener');
+      return;
+    }
+
+    const ref = doc(database, 'analyses', analysisId);
+
     firestoreUnsubscribe = onSnapshot(ref, (snap) => {
       if (!snap.exists()) return;
       
@@ -937,7 +1366,7 @@ function renderAnalysisResults(analysisId, data) {
         <div class="vimeo-action">
           <h4>🎉 ¡Video aprobado para Vimeo!</h4>
           <p>Tu video cumple con los estándares de calidad (≥${threshold}%). Puedes subirlo a Vimeo cuando estés listo.</p>
-          <button class="btn-vimeo" onclick="uploadToVimeo('${analysisId}')">
+          <button class="btn-vimeo" onclick="uploadToVimeo('${analysisId}', event)">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
               <path d="M23.977 6.416c-.105 2.338-1.739 5.543-4.894 9.609-3.268 4.247-6.026 6.37-8.29 6.37-1.409 0-2.578-1.294-3.553-3.881L5.322 11.4C4.603 8.816 3.834 7.522 3.01 7.522c-.179 0-.806.378-1.881 1.132L0 7.197a315.065 315.065 0 0 0 3.501-3.128C5.08 2.701 6.266 1.984 7.055 1.91c1.867-.18 3.016 1.1 3.447 3.838.465 2.953.789 4.789.971 5.507.537 2.45 1.131 3.674 1.776 3.674.502 0 1.256-.796 2.265-2.385 1.004-1.589 1.54-2.797 1.612-3.628.144-1.371-.395-2.061-1.614-2.061-.574 0-1.167.121-1.777.391 1.186-3.868 3.434-5.757 6.762-5.637 2.473.06 3.628 1.664 3.493 4.797l-.013.01z"/>
             </svg>
@@ -1025,17 +1454,19 @@ function renderAnalysisError(error) {
 /* ==========
    Subir a Vimeo
    ========== */
-window.uploadToVimeo = async function uploadToVimeo(analysisId) {
+window.uploadToVimeo = async function uploadToVimeo(analysisId, event) {
   try {
     if (!selectedFile) {
       alert('El archivo de video ya no está disponible. Por favor, inicia el análisis nuevamente.');
       return;
     }
 
-    const btn = event.target;
-    btn.disabled = true;
-    btn.innerHTML = '<div class="spinner"></div> Subiendo...';
-    btn.classList.add('uploading');
+    const btn = event ? event.target : document.querySelector('.btn-vimeo');
+    if (btn) {
+      btn.disabled = true;
+      btn.innerHTML = '<div class="spinner"></div> Subiendo...';
+      btn.classList.add('uploading');
+    }
 
     const form = new FormData();
     form.append('file', selectedFile);
@@ -1107,15 +1538,17 @@ window.uploadToVimeo = async function uploadToVimeo(analysisId) {
     alert(err.message || 'Ocurrió un error al subir el video a Vimeo.');
     
     // Restaurar botón
-    const btn = event.target;
-    btn.disabled = false;
-    btn.innerHTML = `
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-        <path d="M23.977 6.416c-.105 2.338-1.739 5.543-4.894 9.609-3.268 4.247-6.026 6.37-8.29 6.37-1.409 0-2.578-1.294-3.553-3.881L5.322 11.4C4.603 8.816 3.834 7.522 3.01 7.522c-.179 0-.806.378-1.881 1.132L0 7.197a315.065 315.065 0 0 0 3.501-3.128C5.08 2.701 6.266 1.984 7.055 1.91c1.867-.18 3.016 1.1 3.447 3.838.465 2.953.789 4.789.971 5.507.537 2.45 1.131 3.674 1.776 3.674.502 0 1.256-.796 2.265-2.385 1.004-1.589 1.54-2.797 1.612-3.628.144-1.371-.395-2.061-1.614-2.061-.574 0-1.167.121-1.777.391 1.186-3.868 3.434-5.757 6.762-5.637 2.473.06 3.628 1.664 3.493 4.797l-.013.01z"/>
-      </svg>
-      Subir a Vimeo
-    `;
-    btn.classList.remove('uploading');
+    const btn = event ? event.target : document.querySelector('.btn-vimeo');
+    if (btn) {
+      btn.disabled = false;
+      btn.innerHTML = `
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M23.977 6.416c-.105 2.338-1.739 5.543-4.894 9.609-3.268 4.247-6.026 6.37-8.29 6.37-1.409 0-2.578-1.294-3.553-3.881L5.322 11.4C4.603 8.816 3.834 7.522 3.01 7.522c-.179 0-.806.378-1.881 1.132L0 7.197a315.065 315.065 0 0 0 3.501-3.128C5.08 2.701 6.266 1.984 7.055 1.91c1.867-.18 3.016 1.1 3.447 3.838.465 2.953.789 4.789.971 5.507.537 2.45 1.131 3.674 1.776 3.674.502 0 1.256-.796 2.265-2.385 1.004-1.589 1.54-2.797 1.612-3.628.144-1.371-.395-2.061-1.614-2.061-.574 0-1.167.121-1.777.391 1.186-3.868 3.434-5.757 6.762-5.637 2.473.06 3.628 1.664 3.493 4.797l-.013.01z"/>
+        </svg>
+        Subir a Vimeo
+      `;
+      btn.classList.remove('uploading');
+    }
   }
 };
 
@@ -1164,7 +1597,7 @@ function updateVimeoHeaderButton(analysisId, qualifies, vimeoStatus, score, thre
       </svg>
       Subir a Vimeo
     `;
-    btn.onclick = () => window.uploadToVimeoFromHeader();
+    btn.onclick = (event) => window.uploadToVimeoFromHeader(event);
   } else {
     // No califica - botón deshabilitado
     btn.style.display = 'inline-flex';
@@ -1181,17 +1614,17 @@ function updateVimeoHeaderButton(analysisId, qualifies, vimeoStatus, score, thre
   }
 }
 
-window.uploadToVimeoFromHeader = async function uploadToVimeoFromHeader() {
+window.uploadToVimeoFromHeader = async function uploadToVimeoFromHeader(event) {
   if (!currentAnalysisId) {
     alert('No hay análisis activo');
     return;
   }
-  await window.uploadToVimeo(currentAnalysisId);
+  await window.uploadToVimeo(currentAnalysisId, event);
 };
 </script>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    <script type="module" src="js/dashboard-init.js"></script>
-    <script type="module" src="js/apps-manager.js"></script>
+    <script type="module" src="js/dashboard-init.js?v=2.3"></script>
+    <script type="module" src="js/apps-manager.js?v=2.3"></script>
 </body>
 </html>

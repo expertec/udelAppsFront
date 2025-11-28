@@ -1,0 +1,272 @@
+/* Admin Dashboard con Sidebar */
+.admin-dashboard {
+    display: flex;
+    min-height: calc(100vh - 70px); /* Altura mínima en lugar de altura fija */
+    background: #f3f4f6;
+    position: relative;
+}
+
+/* Sidebar */
+.admin-sidebar {
+    width: 280px;
+    background: #742f34; /* Color granate/vino exacto del navbar */
+    border-right: 1px solid #742f34;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 2px 0 4px rgba(0, 0, 0, 0.15);
+    position: fixed; /* Fijar la barra lateral */
+    left: 0;
+    top: 70px; /* Altura del navbar */
+    bottom: 0;
+    z-index: 100;
+    overflow-y: auto;
+}
+
+.sidebar-header {
+    padding: 24px 20px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.sidebar-header h2 {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 700;
+    color: white;
+}
+
+.sidebar-header p {
+    margin: 4px 0 0 0;
+    font-size: 13px;
+    color: rgba(255, 255, 255, 0.7);
+}
+
+.sidebar-nav {
+    flex: 1;
+    overflow-y: auto;
+    padding: 12px 0;
+}
+
+.nav-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 20px;
+    color: #e5e7eb; /* Color claro para texto en fondo oscuro */
+    cursor: pointer;
+    transition: all 0.2s;
+    border-left: 3px solid transparent;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.nav-item:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+}
+
+.nav-item.active {
+    background: rgba(255, 255, 255, 0.15);
+    color: white;
+    border-left-color: white;
+}
+
+.nav-item svg {
+    width: 20px;
+    height: 20px;
+    flex-shrink: 0;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+/* Logo o imagen en la barra lateral */
+.sidebar-logo {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px 0;
+    margin-bottom: 10px;
+}
+
+.sidebar-logo img {
+    max-width: 80%;
+    height: auto;
+}
+
+.nav-divider {
+    height: 1px;
+    background: rgba(255, 255, 255, 0.1);
+    margin: 8px 20px;
+}
+
+/* Main Content Area */
+.admin-main {
+    flex: 1;
+    padding: 32px;
+    margin-left: 280px; /* Mismo ancho que la barra lateral */
+    min-height: 100%;
+    overflow-y: visible; /* Permitir que el contenido fluya naturalmente */
+}
+
+.admin-content-section {
+    display: none;
+}
+
+.admin-content-section.active {
+    display: block;
+    animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.section-title {
+    font-size: 24px;
+    font-weight: 700;
+    color: #1f2937;
+    margin: 0 0 8px 0;
+}
+
+.section-subtitle {
+    font-size: 14px;
+    color: #6b7280;
+    margin: 0 0 24px 0;
+}
+
+.content-card {
+    background: white;
+    border-radius: 12px;
+    padding: 24px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    margin-bottom: 24px;
+}
+
+.card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.card-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: #1f2937;
+    margin: 0;
+}
+
+/* Navbar fijo - Usamos !important para asegurar que estos estilos tengan prioridad */
+.navbar {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    z-index: 1000 !important;
+    background: linear-gradient(135deg, #742f34 0%, #491316 100%) !important;
+    color: white !important;
+    height: 70px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    padding: 0 24px !important;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) !important;
+}
+
+/* Responsive */
+/* Ajuste para el contenedor principal */
+.container {
+    margin-top: 100px !important; /* Dar espacio para el navbar fijo */
+    padding-bottom: 50px !important; /* Espacio al final de la página */
+}
+
+@media (max-width: 768px) {
+    .admin-dashboard {
+        flex-direction: column;
+        min-height: auto;
+        margin-top: 70px; /* Espacio para el navbar fijo */
+    }
+
+    .admin-sidebar {
+        position: static; /* Quitar posición fija en móvil */
+        width: 100%;
+        height: auto;
+        border-right: none;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .sidebar-nav {
+        display: flex;
+        overflow-x: auto;
+        padding: 0;
+    }
+
+    .nav-item {
+        flex-direction: column;
+        gap: 4px;
+        padding: 12px 16px;
+        border-left: none;
+        border-bottom: 3px solid transparent;
+        white-space: nowrap;
+        font-size: 12px;
+    }
+
+    .nav-item.active {
+        border-left: none;
+        border-bottom-color: white;
+    }
+
+    .nav-item svg {
+        width: 24px;
+        height: 24px;
+    }
+
+    .nav-divider {
+        display: none;
+    }
+
+    .admin-main {
+        padding: 20px 16px;
+        margin-left: 0; /* Eliminar margen en móvil */
+        overflow-y: visible;
+    }
+
+    .section-title {
+        font-size: 20px;
+    }
+}
+
+/* Empty State */
+.empty-state {
+    text-align: center;
+    padding: 60px 20px;
+    color: #9ca3af;
+}
+
+.empty-state svg {
+    width: 64px;
+    height: 64px;
+    margin: 0 auto 16px;
+    opacity: 0.5;
+}
+
+.empty-state h3 {
+    font-size: 18px;
+    font-weight: 600;
+    color: #6b7280;
+    margin: 0 0 8px 0;
+}
+
+.empty-state p {
+    font-size: 14px;
+    margin: 0;
+}

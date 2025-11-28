@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Solicitud de Certificado - UDEL</title>
+    <link rel="stylesheet" href="../css/modals.css">
+    <link rel="stylesheet" href="./css/styles.css">
+</head>
+<body>
+    <div class="app-modal open">
+        <div class="app-modal-content">
+            <div class="app-modal-header">
+                <h3 class="app-modal-title">Solicitud de Certificado</h3>
+                <button class="app-modal-close" onclick="window.location.href='../dashboard.html'">×</button>
+            </div>
+            <div class="app-modal-body">
+                <form id="certificadoForm">
+                    <!-- Primera pantalla - Información académica -->
+                        <div id="pantalla1" class="pantalla">
+                            <h2>Solicitud de Certificados</h2>
+    
+                            <div class="form-group">
+                                <label for="numeroPedido">No. de pedido:</label>
+                                <input type="text" id="numeroPedido" name="numeroPedido" required>
+                            </div>
+    
+                            <div class="form-group">
+                                <label for="curpTexto">CURP (Texto):</label>
+                                <input type="text" id="curpTexto" name="curpTexto" required>
+                            </div>
+    
+                            <div class="form-group">
+                                <label for="correoElectronico">Correo Electrónico:</label>
+                                <input type="email" id="correoElectronico" name="correoElectronico" required>
+                            </div>
+    
+                            <div class="form-group">
+                                <label for="fechaSecundaria">Fecha en que concluyó secundaria:</label>
+                                <input type="date" id="fechaSecundaria" name="fechaSecundaria" required>
+                            </div>
+    
+                            <div class="form-group">
+                                <label for="nombres">Nombre(s):</label>
+                                <input type="text" id="nombres" name="nombres" required>
+                            </div>
+    
+                            <div class="form-group">
+                                <label for="apellidoPaterno">Apellido Paterno:</label>
+                                <input type="text" id="apellidoPaterno" name="apellidoPaterno" required>
+                            </div>
+    
+                            <div class="form-group">
+                                <label for="apellidoMaterno">Apellido Materno:</label>
+                                <input type="text" id="apellidoMaterno" name="apellidoMaterno" required>
+                            </div>
+    
+                            <div class="form-group">
+                                <label for="promedio">Promedio:</label>
+                                <input type="number" id="promedio" name="promedio" step="0.01" min="0" max="10" required>
+                            </div>
+    
+                            <div class="form-actions">
+                                <button type="button" class="btn-primary" onclick="siguientePantalla()">Siguiente</button>
+                            </div>
+                        </div>
+    
+                        <!-- Segunda pantalla - Datos personales y documentos -->
+                        <div id="pantalla2" class="pantalla" style="display: none;">
+                            <div class="form-group">
+                                <label for="whatsapp">WhatsApp:</label>
+                                <input type="tel" id="whatsapp" name="whatsapp" required>
+                            </div>
+    
+                            <div class="form-group">
+                                <label for="plantel">Plantel:</label>
+                                <select id="plantel" name="plantel" required>
+                                    <option value="">Seleccionar plantel</option>
+                                    <option value="Cabo San Lucas">Cabo San Lucas</option>
+                                    <!-- Otros planteles se cargarán dinámicamente -->
+                                </select>
+                            </div>
+    
+                            <div class="form-group">
+                                <label for="certificadoSecundaria">Certificado Secundaria (PDF):</label>
+                                <div class="file-input-container">
+                                    <input type="file" id="certificadoSecundaria" name="certificadoSecundaria" accept=".pdf" required>
+                                    <label for="certificadoSecundaria" class="file-input-label">Seleccionar archivo</label>
+                                    <span class="file-name">Sin archivos seleccionados</span>
+                                </div>
+                            </div>
+    
+                            <div class="form-group">
+                                <label for="actaNacimiento">Acta de Nacimiento (PDF):</label>
+                                <div class="file-input-container">
+                                    <input type="file" id="actaNacimiento" name="actaNacimiento" accept=".pdf" required>
+                                    <label for="actaNacimiento" class="file-input-label">Seleccionar archivo</label>
+                                    <span class="file-name">Sin archivos seleccionados</span>
+                                </div>
+                            </div>
+    
+                            <div class="form-group">
+                                <label for="curpArchivo">CURP (Archivo PDF):</label>
+                                <div class="file-input-container">
+                                    <input type="file" id="curpArchivo" name="curpArchivo" accept=".pdf" required>
+                                    <label for="curpArchivo" class="file-input-label">Seleccionar archivo</label>
+                                    <span class="file-name">Sin archivos seleccionados</span>
+                                </div>
+                            </div>
+    
+                            <div class="form-group">
+                                <label for="comprobanteDomicilio">Comprobante de Domicilio (PDF):</label>
+                                <div class="file-input-container">
+                                    <input type="file" id="comprobanteDomicilio" name="comprobanteDomicilio" accept=".pdf" required>
+                                    <label for="comprobanteDomicilio" class="file-input-label">Seleccionar archivo</label>
+                                    <span class="file-name">Sin archivos seleccionados</span>
+                                </div>
+                            </div>
+    
+                            <div class="form-group">
+                                <label for="ine">INE (PDF):</label>
+                                <div class="file-input-container">
+                                    <input type="file" id="ine" name="ine" accept=".pdf" required>
+                                    <label for="ine" class="file-input-label">Seleccionar archivo</label>
+                                    <span class="file-name">Sin archivos seleccionados</span>
+                                </div>
+                            </div>
+    
+                            <div class="form-group">
+                                <label for="fotografiaAlumno">Fotografía del alumno:</label>
+                                <div class="file-input-container">
+                                    <input type="file" id="fotografiaAlumno" name="fotografiaAlumno" accept=".jpg,.jpeg,.png" required>
+                                    <label for="fotografiaAlumno" class="file-input-label">Seleccionar archivo</label>
+                                    <span class="file-name">Sin archivos seleccionados</span>
+                                </div>
+                            </div>
+
+                        <div class="form-actions">
+                            <button type="button" class="btn-secondary" onclick="pantallaAnterior()">Anterior</button>
+                            <button type="submit" class="btn-primary">Enviar</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Firebase SDK v9 (Modular) -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+
+    <!-- Configuración de Firebase -->
+    <script>
+        // Esperar a que Firebase esté disponible
+        function initFirebase() {
+            // Configuración de Firebase
+            const firebaseConfig = {
+                apiKey: "AIzaSyD28davZLYaw-LwNkpb-UimBXggvwFvqv8",
+                authDomain: "udel-tools.firebaseapp.com",
+                projectId: "udel-tools",
+                storageBucket: "udel-tools.appspot.com",
+                messagingSenderId: "473156729973",
+                appId: "1:473156729973:web:c3915b9154156e6bc58c3c",
+                measurementId: "G-8D5EZNPRH7"
+            };
+
+            // Inicializar Firebase
+            if (!firebase.apps.length) {
+                firebase.initializeApp(firebaseConfig);
+            }
+
+            // Exponer globalmente
+            window.db = firebase.firestore();
+            window.auth = firebase.auth();
+
+            console.log('✅ Firebase inicializado correctamente');
+        }
+
+        // Verificar si Firebase ya está cargado
+        if (typeof firebase !== 'undefined') {
+            initFirebase();
+        } else {
+            // Si no, esperar a que window esté completamente cargada
+            window.addEventListener('load', function() {
+                if (typeof firebase !== 'undefined') {
+                    initFirebase();
+                } else {
+                    console.error('❌ Firebase no pudo cargarse');
+                }
+            });
+        }
+    </script>
+
+    <script src="./js/script.js"></script>
+</body>
+</html>
